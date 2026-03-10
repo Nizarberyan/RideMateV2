@@ -19,7 +19,7 @@ export class UsersService {
     });
   }
 
-  async findById(id: number): Promise<User | null> {
+  async findById(id: string): Promise<User | null> {
     return await this.prisma.user.findUnique({
       where: { id },
       include: {
@@ -29,7 +29,8 @@ export class UsersService {
     });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    console.log(`Updating user ${id} with:`, updateUserDto);
     return this.prisma.user.update({
       where: { id },
       data: updateUserDto,

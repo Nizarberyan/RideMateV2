@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Request,
+  Query,
 } from "@nestjs/common";
 import { RidesService } from "./rides.service";
 import { CreateRideDto } from "./dto/create-ride.dto";
@@ -24,14 +25,25 @@ export class RidesController {
     return this.ridesService.create(req.user.id, createRideDto);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get("mine")
+  findAllByUser(@Request() req: any) {
+    return this.ridesService.findAllByUser(req.user.id);
+  }
+
   @Get()
-  findAll() {
-    return this.ridesService.findAll();
+  findAll(
+    @Query("from") from?: string,
+    @Query("to") to?: string,
+    @Query("date") date?: string,
+    @Query("city") city?: string,
+  ) {
+    return this.ridesService.findAll({ from, to, date, city });
   }
 
   @Get(":id")
   findOne(@Param("id") id: string) {
-    return this.ridesService.findOne(+id);
+    return this.ridesService.findOne(id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -41,12 +53,12 @@ export class RidesController {
     @Param("id") id: string,
     @Body() updateRideDto: UpdateRideDto,
   ) {
-    return this.ridesService.update(+id, req.user.id, updateRideDto);
+    return this.ridesService.update(id, req.user.id, updateRideDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(":id")
   remove(@Request() req: any, @Param("id") id: string) {
-    return this.ridesService.remove(+id, req.user.id);
+    return this.ridesService.remove(id, req.user.id);
   }
 }

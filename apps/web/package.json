@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@fontsource/roboto": "^5.2.10",
+    "@repo/api-client": "workspace:*",
     "@repo/ui": "workspace:*",
     "clsx": "^2.1.1",
     "framer-motion": "^12.35.2",

@@ -5,6 +5,7 @@ import { UsersModule } from "../users/users.module";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { JwtStrategy } from "./jwt.strategy";
+import { JwtRefreshStrategy } from "./jwt-refresh.strategy";
 
 @Module({
   imports: [
@@ -13,10 +14,9 @@ import { JwtStrategy } from "./jwt.strategy";
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET || "fallback_secret_for_dev_only",
-      signOptions: { expiresIn: "7d" },
     }),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, JwtRefreshStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}

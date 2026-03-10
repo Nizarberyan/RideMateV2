@@ -7,7 +7,7 @@ import { PrismaService } from "../prisma/prisma.service";
 export class RidesService {
   constructor(private prisma: PrismaService) {}
 
-  async create(driverId: number, createRideDto: CreateRideDto) {
+  async create(driverId: string, createRideDto: CreateRideDto) {
     return this.prisma.ride.create({
       data: {
         ...createRideDto,
@@ -17,17 +17,68 @@ export class RidesService {
     });
   }
 
-  async findAll() {
+  async findAllByUser(driverId: string) {
     return this.prisma.ride.findMany({
+      where: { driverId },
       include: {
-        driver: {
-          select: { id: true, name: true, photo: true },
+        bookings: {
+          include: {
+            user: {
+              select: { id: true, name: true, photo: true },
+            },
+          },
         },
       },
     });
   }
 
-  async findOne(id: number) {
+  async findAll(filters?: { from?: string; to?: string; date?: string; city?: string }) {
+    const where: any = {
+      status: 'ACTIVE',
+    };
+
+    if (filters?.from) {
+      where.startLocation = { contains: filters.from, mode: 'insensitive' };
+    }
+    if (filters?.to) {
+      where.endLocation = { contains: filters.to, mode: 'insensitive' };
+    }
+    if (filters?.date) {
+      const searchDate = new Date(filters.date);
+      const nextDay = new Date(searchDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+      
+      where.departureDatetime = {
+        gte: searchDate,
+        lt: nextDay,
+      };
+    }
+    
+    // If no filters, and a city is provided, prioritize rides from that city
+    if (!filters?.from && !filters?.to && !filters?.date && filters?.city) {
+      where.startLocation = { contains: filters.city, mode: 'insensitive' };
+    }
+
+    return this.prisma.ride.findMany({
+      where,
+      take: 20,
+      orderBy: { departureDatetime: 'asc' },
+      include: {
+        driver: {
+          select: {
+            id: true,
+            name: true,
+            photo: true,
+            vehicleModel: true,
+            vehicleColor: true,
+            vehiclePlate: true,
+          },
+        },
+      },
+    });
+  }
+
+  async findOne(id: string) {
     const ride = await this.prisma.ride.findUnique({
       where: { id },
       include: {
@@ -38,6 +89,9 @@ export class RidesService {
             photo: true,
             bio: true,
             carbonSavedKg: true,
+            vehicleModel: true,
+            vehicleColor: true,
+            vehiclePlate: true,
           },
         },
       },
@@ -46,7 +100,7 @@ export class RidesService {
     return ride;
   }
 
-  async update(id: number, driverId: number, updateRideDto: UpdateRideDto) {
+  async update(id: string, driverId: string, updateRideDto: UpdateRideDto) {
     const ride = await this.findOne(id);
     if (ride.driverId !== driverId) {
       throw new NotFoundException("Not authorized to update this ride");
@@ -63,7 +117,7 @@ export class RidesService {
     });
   }
 
-  async remove(id: number, driverId: number) {
+  async remove(id: string, driverId: string) {
     const ride = await this.findOne(id);
     if (ride.driverId !== driverId) {
       throw new NotFoundException("Not authorized to delete this ride");

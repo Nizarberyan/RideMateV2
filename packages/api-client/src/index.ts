@@ -1,0 +1,151 @@
+export type User = {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  photo?: string | null;
+  bio?: string | null;
+  city?: string | null;
+  carbonSavedKg: number;
+  vehicleModel?: string | null;
+  vehicleColor?: string | null;
+  vehiclePlate?: string | null;
+  createdAt: string;
+};
+
+export type Ride = {
+  id: string;
+  driverId: string;
+  driver?: User;
+  startLocation: string;
+  endLocation: string;
+  departureDatetime: string;
+  availableSeats: number;
+  status: string;
+  description?: string;
+  distanceKm?: number;
+  bookings: Booking[];
+};
+
+export type Booking = {
+  id: string;
+  userId: string;
+  rideId: string;
+  seatsBooked: number;
+  status: string;
+  pickupLocation?: string;
+  dropoffLocation?: string;
+  ride: Ride;
+};
+
+export interface CreateRideInput {
+  startLocation: string;
+  endLocation: string;
+  departureDatetime: string;
+  availableSeats: number;
+  description?: string;
+  distanceKm?: number;
+}
+
+export interface UpdateUserInput {
+  name?: string;
+  bio?: string;
+  photo?: string;
+  city?: string;
+  vehicleModel?: string;
+  vehicleColor?: string;
+  vehiclePlate?: string;
+}
+
+export interface AuthResponse {
+  access_token: string;
+  refresh_token: string;
+  user: User;
+}
+
+export interface RefreshResponse {
+  access_token: string;
+  refresh_token: string;
+}
+
+export interface ClientOptions {
+  baseUrl: string;
+  getToken?: () => string | null | Promise<string | null>;
+}
+
+export interface RideFilters {
+  from?: string;
+  to?: string;
+  date?: string;
+  city?: string;
+}
+
+export const createClient = (options: ClientOptions) => {
+  const fetchApi = async (endpoint: string, init: RequestInit = {}) => {
+    const token = options.getToken ? await options.getToken() : null;
+    
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...init.headers,
+    };
+
+    const response = await fetch(`${options.baseUrl}${endpoint}`, {
+      ...init,
+      headers,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Something went wrong");
+    }
+
+    return response.json();
+  };
+
+  return {
+    fetchApi,
+    getToken: options.getToken || (() => null),
+    auth: {
+      login: (data: any): Promise<AuthResponse> => fetchApi("/auth/login", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+      register: (data: any): Promise<AuthResponse> => fetchApi("/auth/register", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+      refresh: (refreshToken: string): Promise<RefreshResponse> => fetchApi("/auth/refresh", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${refreshToken}` },
+      }),
+      logout: (): Promise<void> => fetchApi("/auth/logout", { method: "POST" }),
+      getProfile: (): Promise<User> => fetchApi("/auth/profile"),
+      updateProfile: (data: UpdateUserInput): Promise<User> => fetchApi("/auth/profile", {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      }),
+    },
+    rides: {
+      getMine: (): Promise<Ride[]> => fetchApi("/rides/mine"),
+      getAll: (filters?: RideFilters): Promise<Ride[]> => {
+        const params = new URLSearchParams();
+        if (filters?.from) params.append("from", filters.from);
+        if (filters?.to) params.append("to", filters.to);
+        if (filters?.date) params.append("date", filters.date);
+        if (filters?.city) params.append("city", filters.city);
+        
+        const queryString = params.toString();
+        return fetchApi(`/rides${queryString ? `?${queryString}` : ""}`);
+      },
+      getOne: (id: string): Promise<Ride> => fetchApi(`/rides/${id}`),
+      create: (data: CreateRideInput): Promise<Ride> => fetchApi("/rides", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    },
+    bookings: {
+      getMine: (): Promise<Booking[]> => fetchApi("/bookings"),
+    },
+  };
+};

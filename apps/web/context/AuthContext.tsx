@@ -1,22 +1,20 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useCallback,
+} from "react";
 import { useRouter } from "next/navigation";
-import { fetchApi } from "../lib/api";
-
-type User = {
-  id: number;
-  email: string;
-  name: string;
-  role: string;
-  photo?: string | null;
-  carbonSavedKg: number;
-};
+import { User, AuthResponse } from "@repo/api-client";
+import { client } from "../lib/api";
 
 type AuthContextType = {
   user: User | null;
-  token: string | null;
-  login: (token: string, user: User) => void;
+  login: (authData: AuthResponse) => void;
   logout: () => void;
   isLoading: boolean;
 };
@@ -25,21 +23,44 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  const login = useCallback((newToken: string, userData: User) => {
-    setToken(newToken);
-    setUser(userData);
-    localStorage.setItem("token", newToken);
-    router.push("/dashboard");
-  }, [router]);
+  const refreshAuth = useCallback(async () => {
+    try {
+      const refreshToken = localStorage.getItem("refresh_token");
+      if (refreshToken) {
+        const response = await client.auth.refresh(refreshToken);
+        localStorage.setItem("token", response.access_token);
+        localStorage.setItem("refresh_token", response.refresh_token);
+        return true;
+      }
+    } catch (e) {
+      console.error("Token refresh failed", e);
+      logout();
+    }
+    return false;
+  }, []);
 
-  const logout = useCallback(() => {
-    setToken(null);
+  const login = useCallback(
+    (authData: AuthResponse) => {
+      setUser(authData.user);
+      localStorage.setItem("token", authData.access_token);
+      localStorage.setItem("refresh_token", authData.refresh_token);
+      router.push("/dashboard");
+    },
+    [router],
+  );
+
+  const logout = useCallback(async () => {
+    try {
+      await client.auth.logout();
+    } catch (e) {
+      console.error("Logout error", e);
+    }
     setUser(null);
     localStorage.removeItem("token");
+    localStorage.removeItem("refresh_token");
     router.push("/login");
   }, [router]);
 
@@ -47,26 +68,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const initializeAuth = async () => {
       const storedToken = localStorage.getItem("token");
       if (storedToken) {
-        setToken(storedToken);
         try {
           // Fetch current user profile to verify token
-          const userData = await fetchApi("/auth/profile", {
-            headers: { Authorization: `Bearer ${storedToken}` },
-          });
+          const userData = await client.auth.getProfile();
           setUser(userData);
         } catch (error) {
-          console.error("Token verification failed:", error);
-          logout();
+          // Try to refresh
+          const success = await refreshAuth();
+          if (success) {
+            const userData = await client.auth.getProfile();
+            setUser(userData);
+          } else {
+            console.error("Token verification and refresh failed");
+            logout();
+          }
         }
       }
       setIsLoading(false);
     };
 
     initializeAuth();
-  }, [logout]);
+
+    // Refresh interval every 45 mins
+    const interval = setInterval(() => {
+      if (localStorage.getItem("refresh_token")) {
+        refreshAuth();
+      }
+    }, 1000 * 60 * 45);
+
+    return () => clearInterval(interval);
+  }, [logout, refreshAuth]);
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

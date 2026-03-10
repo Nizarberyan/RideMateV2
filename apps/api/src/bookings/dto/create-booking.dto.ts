@@ -8,8 +8,8 @@ import {
 
 export class CreateBookingDto {
   @IsNotEmpty()
-  @IsNumber()
-  rideId!: number;
+  @IsString()
+  rideId!: string;
 
   @IsNotEmpty()
   @IsNumber()

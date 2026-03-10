@@ -31,7 +31,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${roboto.variable} ${geistSans.variable} ${geistMono.variable} font-sans`}>
+      <body
+        className={`${roboto.variable} ${geistSans.variable} ${geistMono.variable} font-sans`}
+      >
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

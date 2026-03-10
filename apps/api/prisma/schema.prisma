@@ -15,7 +15,7 @@ datasource db {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
+  id            String   @id @default(uuid())
   name          String?
   email         String   @unique
   password      String
@@ -23,6 +23,16 @@ model User {
   photo         String?
   role          Role     @default(USER)
   carbonSavedKg Float    @default(0)
+  city          String?
+  
+  // Refresh Token
+  refreshToken  String?
+
+  // Vehicle Details (for drivers)
+  vehicleModel  String?
+  vehicleColor  String?
+  vehiclePlate  String?
+
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -36,8 +46,8 @@ enum Role {
 }
 
 model Ride {
-  id                Int        @id @default(autoincrement())
-  driverId          Int
+  id                String     @id @default(uuid())
+  driverId          String
   driver            User       @relation("DriverRides", fields: [driverId], references: [id])
   startLocation     String
   endLocation       String
@@ -61,10 +71,10 @@ enum RideStatus {
 }
 
 model Booking {
-  id              Int           @id @default(autoincrement())
-  userId          Int
+  id              String        @id @default(uuid())
+  userId          String
   user            User          @relation(fields: [userId], references: [id])
-  rideId          Int
+  rideId          String
   ride            Ride          @relation(fields: [rideId], references: [id])
   seatsBooked     Int           @default(1)
   status          BookingStatus @default(PENDING)
