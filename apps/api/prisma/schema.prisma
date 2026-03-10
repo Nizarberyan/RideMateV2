@@ -6,7 +6,8 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
+  moduleFormat    = "cjs"
 }
 
 datasource db {
@@ -14,7 +15,72 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+  id            Int      @id @default(autoincrement())
+  name          String?
+  email         String   @unique
+  password      String
+  bio           String?
+  photo         String?
+  role          Role     @default(USER)
+  carbonSavedKg Float    @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  ridesAsDriver Ride[]    @relation("DriverRides")
+  bookings      Booking[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Ride {
+  id                Int        @id @default(autoincrement())
+  driverId          Int
+  driver            User       @relation("DriverRides", fields: [driverId], references: [id])
+  startLocation     String
+  endLocation       String
+  departureDatetime DateTime
+  availableSeats    Int
+  status            RideStatus @default(ACTIVE)
+  description       String?
+  distanceKm        Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings Booking[]
+}
+
+enum RideStatus {
+  ACTIVE
+  FULL
+  CANCELLED
+  COMPLETED
+}
+
+model Booking {
+  id              Int           @id @default(autoincrement())
+  userId          Int
+  user            User          @relation(fields: [userId], references: [id])
+  rideId          Int
+  ride            Ride          @relation(fields: [rideId], references: [id])
+  seatsBooked     Int           @default(1)
+  status          BookingStatus @default(PENDING)
+  totalPrice      Float?
+  passengerNotes  String?
+  pickupLocation  String?
+  dropoffLocation String?
+  isRated         Boolean       @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
 }

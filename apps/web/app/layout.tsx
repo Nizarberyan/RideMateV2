@@ -1,6 +1,14 @@
+import { AuthProvider } from "../context/AuthContext";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Roboto } from "next/font/google";
 import "./globals.css";
+
+const roboto = Roboto({
+  weight: ["300", "400", "500", "700"],
+  subsets: ["latin"],
+  variable: "--font-roboto",
+});
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -23,8 +31,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+      <body className={`${roboto.variable} ${geistSans.variable} ${geistMono.variable} font-sans`}>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
