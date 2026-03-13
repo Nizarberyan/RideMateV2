@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  ScrollView, 
-  TouchableOpacity, 
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
-  TextInput,
   KeyboardAvoidingView,
   Platform,
   Alert,
@@ -15,10 +14,12 @@ import {
   Dimensions
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Search as SearchIcon, MapPin, Calendar, Users, ArrowRight, X, ChevronLeft, ChevronRight } from 'lucide-react-native';
+import { Search as SearchIcon, MapPin, Calendar, Users, ArrowRight, X } from 'lucide-react-native';
 import { Ride } from '@repo/api-client';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { Button, Input, Card } from '../../components/ui';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
 
@@ -26,7 +27,7 @@ export default function SearchScreen() {
   const { client, user } = useAuth();
   const { theme, isDark } = useTheme();
   const insets = useSafeAreaInsets();
-  
+
   const [rides, setRides] = useState<Ride[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -116,153 +117,178 @@ export default function SearchScreen() {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <KeyboardAvoidingView 
+    <View style={[styles.container, { backgroundColor: theme.primary }]}>
+      <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
       >
-        <View style={[
-          styles.searchHeader, 
-          { 
-            backgroundColor: theme.surface, 
-            borderBottomColor: theme.border,
-            paddingTop: insets.top + 10
-          }
-        ]}>
-          <Text style={[styles.searchTitle, { color: theme.text }]}>Find your next ride</Text>
-          
-          <View style={styles.formContainer}>
-            <View style={[styles.inputRow, { borderBottomWidth: 1, borderBottomColor: theme.border }]}>
-              <MapPin size={18} color={theme.primary} />
-              <TextInput
-                style={[styles.input, { color: theme.text }]}
-                placeholder="From where?"
-                placeholderTextColor={theme.textMuted}
-                value={searchForm.from}
-                onChangeText={(text) => setSearchForm({...searchForm, from: text})}
-              />
-            </View>
-            
-            <View style={[styles.inputRow, { borderBottomWidth: 1, borderBottomColor: theme.border }]}>
-              <MapPin size={18} color="#ef4444" />
-              <TextInput
-                style={[styles.input, { color: theme.text }]}
-                placeholder="To where?"
-                placeholderTextColor={theme.textMuted}
-                value={searchForm.to}
-                onChangeText={(text) => setSearchForm({...searchForm, to: text})}
-              />
-            </View>
-
-            <TouchableOpacity 
-              style={styles.inputRow}
-              onPress={() => setShowCustomPicker(true)}
-              activeOpacity={0.7}
-            >
-              <Calendar size={18} color={theme.textMuted} />
-              <Text style={[
-                styles.dateText, 
-                { color: searchForm.date ? theme.text : theme.textMuted }
-              ]}>
-                {searchForm.date 
-                  ? searchForm.date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
-                  : "When do you want to leave?"
-                }
-              </Text>
-              {isSearching && (
-                <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
-                  <X size={18} color={theme.textMuted} />
-                </TouchableOpacity>
-              )}
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity 
-            style={[styles.searchButton, { backgroundColor: theme.isDark ? theme.primary : '#111827' }]}
-            onPress={handleSearch}
-          >
-            <SearchIcon size={18} color={theme.isDark ? '#000' : '#fff'} />
-            <Text style={[styles.searchButtonText, { color: theme.isDark ? '#000' : '#fff' }]}>Search Rides</Text>
-          </TouchableOpacity>
-        </View>
-
-        <ScrollView 
-          contentContainerStyle={styles.scrollContent}
+        <ScrollView
+          contentContainerStyle={[styles.scrollContent, { backgroundColor: theme.background, flexGrow: 1 }]}
           refreshControl={
-            <RefreshControl 
-              refreshing={refreshing} 
-              onRefresh={onRefresh} 
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
               tintColor={theme.primary}
-              colors={[theme.primary]} 
-              progressViewOffset={20}
+              colors={[theme.primary]}
+              progressViewOffset={insets.top + 20}
             />
           }
         >
-          <View style={styles.resultsHeader}>
-            <Text style={[styles.resultsLabel, { color: theme.text }]}>
-              {isSearching ? `Found ${rides.length} rides` : user?.city ? `Rides in ${user.city}` : "All Rides"}
-            </Text>
-            {!isSearching && (
-              <View style={[styles.nearBadge, { backgroundColor: theme.isDark ? 'rgba(190, 242, 100, 0.1)' : 'rgba(190, 242, 100, 0.2)' }]}>
-                <Text style={[styles.nearText, { color: theme.isDark ? theme.primary : '#4d7c0f' }]}>NEAR YOU</Text>
-              </View>
-            )}
+          <View style={[
+            styles.searchHeader,
+            {
+              backgroundColor: theme.primary,
+              paddingTop: insets.top + 20
+            }
+          ]}>
+            <Animated.Text 
+              entering={FadeInUp.delay(200).duration(800).springify()}
+              style={[styles.searchTitle, { color: '#151515' }]}
+            >
+              Find your next ride
+            </Animated.Text>
+
+            <View style={styles.formContainer}>
+              <Animated.View entering={FadeInUp.delay(400).duration(800).springify()}>
+                <Input
+                  containerStyle={{ marginBottom: 12 }}
+                  inputWrapperStyle={{ backgroundColor: 'rgba(21, 21, 21, 0.08)', borderWidth: 0 }}
+                  leftIcon={<MapPin size={20} color="#151515" />}
+                  placeholder="From where?"
+                  placeholderTextColor="rgba(21, 21, 21, 0.4)"
+                  value={searchForm.from}
+                  onChangeText={(text) => setSearchForm({ ...searchForm, from: text })}
+                />
+              </Animated.View>
+
+              <Animated.View entering={FadeInUp.delay(500).duration(800).springify()}>
+                <Input
+                  containerStyle={{ marginBottom: 12 }}
+                  inputWrapperStyle={{ backgroundColor: 'rgba(21, 21, 21, 0.08)', borderWidth: 0 }}
+                  leftIcon={<MapPin size={20} color="#ef4444" />}
+                  placeholder="To where?"
+                  placeholderTextColor="rgba(21, 21, 21, 0.4)"
+                  value={searchForm.to}
+                  onChangeText={(text) => setSearchForm({ ...searchForm, to: text })}
+                />
+              </Animated.View>
+
+              <Animated.View entering={FadeInUp.delay(600).duration(800).springify()}>
+                <TouchableOpacity
+                  style={[
+                    styles.dateSelector, 
+                    { backgroundColor: 'rgba(21, 21, 21, 0.08)' }
+                  ]}
+                  onPress={() => setShowCustomPicker(true)}
+                  activeOpacity={0.7}
+                >
+                  <Calendar size={20} color="#151515" />
+                  <Text style={[
+                    styles.dateText,
+                    { color: searchForm.date ? '#151515' : 'rgba(21, 21, 21, 0.4)' }
+                  ]}>
+                    {searchForm.date
+                      ? searchForm.date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
+                      : "When do you want to leave?"
+                    }
+                  </Text>
+                  {isSearching && (
+                    <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
+                      <X size={20} color="#151515" />
+                    </TouchableOpacity>
+                  )}
+                </TouchableOpacity>
+              </Animated.View>
+
+              <Animated.View entering={FadeInUp.delay(700).duration(800).springify()} style={{ marginTop: 8 }}>
+                <Button
+                  label="Search Rides"
+                  variant="black"
+                  size="lg"
+                  icon={<SearchIcon size={20} color={isDark ? theme.primary : '#fff'} />}
+                  onPress={handleSearch}
+                />
+              </Animated.View>
+            </View>
           </View>
 
-          {rides.length === 0 ? (
-            <View style={[styles.emptyState, { backgroundColor: theme.surface, borderColor: theme.border }]}>
-              <SearchIcon size={32} color={theme.textMuted} />
-              <Text style={[styles.emptyText, { color: theme.textMuted }]}>
-                No rides found. Try a different search.
-              </Text>
-            </View>
-          ) : (
-            rides.map((ride) => (
-              <TouchableOpacity 
-                key={ride.id} 
-                style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.border }]}
-                activeOpacity={0.8}
+          <View style={styles.mainContent}>
+            <View style={styles.resultsHeader}>
+              <Animated.Text 
+                entering={FadeInDown.delay(700).duration(800).springify()}
+                style={[styles.resultsLabel, { color: theme.text }]}
               >
-                <View style={styles.cardHeader}>
-                  <View style={styles.locationContainer}>
-                    <View style={styles.locationRow}>
-                      <Text style={[styles.locationText, { color: theme.text }]}>{ride.startLocation}</Text>
-                      <ArrowRight size={14} color={theme.textMuted} style={{ marginHorizontal: 8 }} />
-                      <Text style={[styles.locationText, { color: theme.text }]}>{ride.endLocation}</Text>
-                    </View>
-                    <Text style={[styles.rideDate, { color: theme.textMuted }]}>
-                      {new Date(ride.departureDatetime).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                    </Text>
-                  </View>
-                  
-                  <View style={styles.priceContainer}>
-                    <Text style={[styles.price, { color: theme.text }]}>$25</Text>
-                  </View>
+                {isSearching ? `Found ${rides.length} rides` : user?.city ? `Rides in ${user.city}` : "All Rides"}
+              </Animated.Text>
+              {!isSearching && (
+                <Animated.View 
+                  entering={FadeInDown.delay(700).duration(800).springify()}
+                  style={[styles.nearBadge, { backgroundColor: isDark ? 'rgba(193, 241, 29, 0.15)' : 'rgba(193, 241, 29, 0.3)' }]}
+                >
+                  <Text style={[styles.nearText, { color: isDark ? theme.primary : '#4d7c0f' }]}>NEAR YOU</Text>
+                </Animated.View>
+              )}
+            </View>
+
+            {rides.length === 0 ? (
+              <Card style={styles.emptyCard} delay={800}>
+                <View style={styles.emptyState}>
+                  <SearchIcon size={40} color={theme.textMuted} />
+                  <Text style={[styles.emptyText, { color: theme.textMuted }]}>
+                    No rides found. Try a different search.
+                  </Text>
                 </View>
-
-                <View style={[styles.divider, { backgroundColor: theme.border }]} />
-
-                <View style={styles.cardFooter}>
-                  <View style={styles.driverInfo}>
-                    <View style={[styles.driverAvatar, { backgroundColor: theme.primary }]}>
-                      <Text style={styles.avatarText}>{ride.driver?.name?.charAt(0) || 'U'}</Text>
-                    </View>
-                    <View>
-                      <Text style={[styles.driverName, { color: theme.text }]}>{ride.driver?.name || "Unknown Driver"}</Text>
-                      <Text style={[styles.vehicleInfo, { color: theme.textMuted }]}>
-                        {ride.driver?.vehicleModel || "No car info"}
+              </Card>
+            ) : (
+              rides.map((ride, index) => (
+                <Card
+                  key={ride.id}
+                  onPress={() => {}}
+                  contentStyle={{ padding: 0 }}
+                  style={styles.rideCard}
+                  delay={800 + (index * 100)}
+                >
+                  <View style={styles.cardHeader}>
+                    <View style={styles.locationContainer}>
+                      <View style={styles.locationRow}>
+                        <Text style={[styles.locationText, { color: theme.text }]}>{ride.startLocation}</Text>
+                        <ArrowRight size={16} color={theme.textMuted} style={{ marginHorizontal: 10 }} />
+                        <Text style={[styles.locationText, { color: theme.text }]}>{ride.endLocation}</Text>
+                      </View>
+                      <Text style={[styles.rideDate, { color: theme.textMuted }]}>
+                        {new Date(ride.departureDatetime).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </Text>
                     </View>
+
+                    <View style={[styles.priceContainer, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }]}>
+                      <Text style={[styles.price, { color: theme.text }]}>$25</Text>
+                    </View>
                   </View>
-                  <View style={styles.seatsBadge}>
-                    <Users size={14} color={theme.textMuted} />
-                    <Text style={[styles.seatsText, { color: theme.textMuted }]}>{ride.availableSeats} left</Text>
+
+                  <View style={[styles.divider, { backgroundColor: theme.border }]} />
+
+                  <View style={styles.cardFooter}>
+                    <View style={styles.driverInfo}>
+                      <View style={[styles.driverAvatar, { backgroundColor: theme.primary }]}>
+                        <Text style={styles.avatarText}>{ride.driver?.name?.charAt(0) || 'U'}</Text>
+                      </View>
+                      <View>
+                        <Text style={[styles.driverName, { color: theme.text }]}>{ride.driver?.name || "Unknown Driver"}</Text>
+                        <Text style={[styles.vehicleInfo, { color: theme.textMuted }]}>
+                          {ride.driver?.vehicleModel || "No car info"}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={[styles.seatsBadge, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }]}>
+                      <Users size={14} color={theme.textMuted} />
+                      <Text style={[styles.seatsText, { color: theme.textMuted }]}>{ride.availableSeats} left</Text>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            ))
-          )}
-          <View style={{ height: 40 }} />
+                </Card>
+              ))
+            )}
+            <View style={{ height: 40 }} />
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
 
@@ -270,69 +296,73 @@ export default function SearchScreen() {
       <Modal
         visible={showCustomPicker}
         transparent={true}
-        animationType="fade"
+        animationType="slide"
         onRequestClose={() => setShowCustomPicker(false)}
       >
-        <TouchableOpacity 
-          style={styles.modalOverlay} 
-          activeOpacity={1} 
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
           onPress={() => setShowCustomPicker(false)}
         >
           <View style={[styles.modalContent, { backgroundColor: theme.surface }]}>
-            <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: theme.text }]}>Select Date</Text>
-              <TouchableOpacity onPress={() => setShowCustomPicker(false)}>
-                <X size={24} color={theme.text} />
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView 
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.calendarGrid}
-            >
-              <View style={styles.daysContainer}>
-                {calendarDays.map((date, index) => {
-                  const isSelected = searchForm.date?.toDateString() === date.toDateString();
-                  const isToday = new Date().toDateString() === date.toDateString();
-                  
-                  return (
-                    <TouchableOpacity
-                      key={index}
-                      style={[
-                        styles.dayButton,
-                        isSelected && { backgroundColor: theme.primary, borderColor: theme.primary }
-                      ]}
-                      onPress={() => {
-                        setSearchForm({...searchForm, date});
-                        setShowCustomPicker(false);
-                      }}
-                    >
-                      <Text style={[
-                        styles.dayName, 
-                        { color: isSelected ? '#000' : theme.textMuted }
-                      ]}>
-                        {date.toLocaleDateString(undefined, { weekday: 'short' }).toUpperCase()}
-                      </Text>
-                      <Text style={[
-                        styles.dayNumber, 
-                        { color: isSelected ? '#000' : theme.text }
-                      ]}>
-                        {date.getDate()}
-                      </Text>
-                      {isToday && !isSelected && (
-                        <View style={[styles.todayDot, { backgroundColor: theme.primary }]} />
-                      )}
-                    </TouchableOpacity>
-                  );
-                })}
+            <TouchableOpacity activeOpacity={1} style={{ width: '100%' }}>
+              <View style={styles.modalHeader}>
+                <Text style={[styles.modalTitle, { color: theme.text }]}>Select Date</Text>
+                <TouchableOpacity onPress={() => setShowCustomPicker(false)} style={styles.closeModalButton}>
+                  <X size={24} color={theme.text} />
+                </TouchableOpacity>
               </View>
-            </ScrollView>
-            
-            <TouchableOpacity 
-              style={[styles.confirmButton, { backgroundColor: theme.primary }]}
-              onPress={() => setShowCustomPicker(false)}
-            >
-              <Text style={styles.confirmButtonText}>Confirm</Text>
+
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.calendarGrid}
+              >
+                <View style={styles.daysContainer}>
+                  {calendarDays.map((date, index) => {
+                    const isSelected = searchForm.date?.toDateString() === date.toDateString();
+                    const isToday = new Date().toDateString() === date.toDateString();
+
+                    return (
+                      <TouchableOpacity
+                        key={index}
+                        style={[
+                          styles.dayButton,
+                          { borderColor: theme.border },
+                          isSelected && { backgroundColor: theme.primary, borderColor: theme.primary }
+                        ]}
+                        onPress={() => {
+                          setSearchForm({ ...searchForm, date });
+                          setShowCustomPicker(false);
+                        }}
+                      >
+                        <Text style={[
+                          styles.dayName,
+                          { color: isSelected ? '#151515' : theme.textMuted }
+                        ]}>
+                          {date.toLocaleDateString(undefined, { weekday: 'short' }).toUpperCase()}
+                        </Text>
+                        <Text style={[
+                          styles.dayNumber,
+                          { color: isSelected ? '#151515' : theme.text }
+                        ]}>
+                          {date.getDate()}
+                        </Text>
+                        {isToday && !isSelected && (
+                          <View style={[styles.todayDot, { backgroundColor: theme.primary }]} />
+                        )}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </ScrollView>
+
+              <Button
+                label="Confirm Selection"
+                variant="black"
+                size="lg"
+                onPress={() => setShowCustomPicker(false)}
+                style={{ marginTop: 24 }}
+              />
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -350,103 +380,88 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  scrollContent: {
+    padding: 0,
+  },
+  mainContent: {
+    padding: 24,
+  },
   searchHeader: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
+    padding: 24,
+    paddingBottom: 40,
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
   },
   searchTitle: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: '900',
-    marginBottom: 20,
-    letterSpacing: -0.5,
+    marginBottom: 24,
+    letterSpacing: -1,
   },
   formContainer: {
-    backgroundColor: 'rgba(0,0,0,0.03)',
-    borderRadius: 20,
-    overflow: 'hidden',
-    marginBottom: 15,
+    width: '100%',
   },
-  inputRow: {
+  dateSelector: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 15,
-    height: 50,
-  },
-  input: {
-    flex: 1,
-    marginLeft: 12,
-    fontSize: 15,
-    fontWeight: '600',
+    paddingHorizontal: 16,
+    height: 56,
+    borderRadius: 18,
+    marginBottom: 12,
   },
   dateText: {
     flex: 1,
-    marginLeft: 12,
-    fontSize: 15,
-    fontWeight: '600',
+    marginLeft: 16,
+    fontSize: 16,
+    fontWeight: '700',
   },
   clearButton: {
-    padding: 5,
-  },
-  searchButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 55,
-    borderRadius: 18,
-    gap: 10,
-  },
-  searchButtonText: {
-    fontSize: 16,
-    fontWeight: '800',
-  },
-  scrollContent: {
-    padding: 20,
+    padding: 8,
   },
   resultsHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 20,
-    marginTop: 10,
+    marginBottom: 24,
+    marginTop: 12,
   },
   resultsLabel: {
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 22,
+    fontWeight: '900',
+    letterSpacing: -0.5,
   },
   nearBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
   },
   nearText: {
     fontSize: 10,
     fontWeight: '900',
+    letterSpacing: 1,
+  },
+  emptyCard: {
+    padding: 0,
+    marginTop: 24,
+    borderRadius: 32,
+    borderWidth: 0,
   },
   emptyState: {
-    borderRadius: 24,
-    padding: 40,
+    padding: 48,
     alignItems: 'center',
-    borderWidth: 1,
-    marginTop: 20,
   },
   emptyText: {
-    marginTop: 10,
-    fontWeight: '600',
+    marginTop: 16,
+    fontWeight: '700',
+    fontSize: 16,
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 24,
   },
-  card: {
-    borderRadius: 28,
-    padding: 20,
-    marginBottom: 16,
-    borderWidth: 1,
+  rideCard: {
+    padding: 24,
+    marginBottom: 20,
+    borderRadius: 32,
+    borderWidth: 0,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -459,29 +474,28 @@ const styles = StyleSheet.create({
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   locationText: {
-    fontSize: 17,
-    fontWeight: '800',
+    fontSize: 18,
+    fontWeight: '900',
   },
   rideDate: {
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: 14,
+    fontWeight: '600',
   },
   priceContainer: {
-    backgroundColor: 'rgba(0,0,0,0.03)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 14,
   },
   price: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '900',
   },
   divider: {
     height: 1,
-    marginVertical: 15,
+    marginVertical: 18,
     opacity: 0.5,
   },
   cardFooter: {
@@ -495,63 +509,66 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   driverAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 14,
+    width: 44,
+    height: 44,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
   },
   avatarText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '900',
-    color: '#000',
+    color: '#151515',
   },
   driverName: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '800',
   },
   vehicleInfo: {
-    fontSize: 11,
-    fontWeight: '500',
+    fontSize: 12,
+    fontWeight: '600',
   },
   seatsBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    backgroundColor: 'rgba(0,0,0,0.03)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 10,
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
   },
   seatsText: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '800',
   },
   // Custom Modal Styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.6)',
     justifyContent: 'flex-end',
   },
   modalContent: {
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
-    padding: 24,
-    paddingBottom: 40,
-    maxHeight: '80%',
+    padding: 32,
+    paddingBottom: 48,
+    maxHeight: '85%',
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 32,
   },
   modalTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '900',
+    letterSpacing: -0.5,
+  },
+  closeModalButton: {
+    padding: 4,
   },
   calendarGrid: {
-    paddingBottom: 20,
+    paddingBottom: 24,
   },
   daysContainer: {
     flexDirection: 'row',
@@ -560,41 +577,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dayButton: {
-    width: (width - 80) / 4,
-    height: 80,
+    width: (width - 100) / 4,
+    height: 85,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.05)',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.02)',
   },
   dayName: {
-    fontSize: 10,
-    fontWeight: '800',
-    marginBottom: 4,
+    fontSize: 11,
+    fontWeight: '900',
+    marginBottom: 6,
   },
   dayNumber: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '900',
   },
   todayDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     position: 'absolute',
-    bottom: 10,
-  },
-  confirmButton: {
-    height: 60,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  confirmButtonText: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: '#000',
+    bottom: 12,
   }
 });

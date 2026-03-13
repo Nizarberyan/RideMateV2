@@ -4,21 +4,21 @@ import {
   Text, 
   View, 
   ScrollView, 
-  TouchableOpacity, 
   ActivityIndicator,
-  TextInput,
   Alert,
   RefreshControl
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as SecureStore from 'expo-secure-store';
-import { User as UserIcon, Car, Save, LogOut, MapPin } from 'lucide-react-native';
+import { User as UserIcon, Car, Save, LogOut, MapPin, Settings } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { Button, Input, Card, Toggle } from '../../components/ui';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 export default function Profile() {
   const { user, client, signIn, signOut } = useAuth();
-  const { theme, isDark } = useTheme();
+  const { theme, isDark, toggleTheme } = useTheme();
   const insets = useSafeAreaInsets();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -96,7 +96,7 @@ export default function Profile() {
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <ScrollView 
-        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}
+        contentContainerStyle={[styles.scrollContent, { backgroundColor: theme.background, paddingTop: insets.top + 20 }]}
         refreshControl={
           <RefreshControl 
             refreshing={refreshing} 
@@ -107,115 +107,122 @@ export default function Profile() {
           />
         }
       >
-        <View style={styles.profileHeader}>
+        <View style={{ backgroundColor: theme.background, position: 'absolute', top: -(insets.top + 20), left: 0, right: 0, height: insets.top + 20 + 100 }} />
+        
+        <Animated.View 
+          entering={FadeInUp.delay(200).duration(800).springify()}
+          style={styles.profileHeader}
+        >
           <View style={[styles.avatarCircle, { backgroundColor: theme.primary, shadowColor: theme.primary }]}>
-            <UserIcon size={40} color="#000" />
+            <UserIcon size={44} color="#151515" />
           </View>
           <Text style={[styles.userName, { color: theme.text }]}>{user?.name || "User"}</Text>
           <Text style={[styles.userEmail, { color: theme.textMuted }]}>{user?.email}</Text>
-        </View>
+        </Animated.View>
 
-        <View style={[styles.section, { backgroundColor: theme.surface, borderColor: theme.border }]}>
-          <View style={styles.sectionHeader}>
-            <UserIcon size={18} color={theme.text} />
-            <Text style={[styles.sectionTitle, { color: theme.text }]}>General Information</Text>
-          </View>
-          
-          <Text style={styles.label}>Full Name</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: theme.background, borderColor: theme.border, color: theme.text }]}
+        <Card 
+          title="App Settings" 
+          subTitle="Customize your app experience"
+          icon={<Settings size={20} color={theme.text} />}
+          style={styles.card}
+          delay={400}
+        >
+          <Toggle 
+            label="Dark Mode" 
+            subLabel="Switch between light and dark themes"
+            value={isDark}
+            onValueChange={toggleTheme}
+          />
+        </Card>
+
+        <Card 
+          title="General Information" 
+          subTitle="Manage your public profile details"
+          icon={<UserIcon size={20} color={theme.text} />}
+          style={styles.card}
+          delay={500}
+        >
+          <Input
+            label="Full Name"
             value={formData.name}
             onChangeText={(text) => setFormData({...formData, name: text})}
-            placeholder="Your Name"
-            placeholderTextColor={theme.textMuted}
+            placeholder="e.g. John Doe"
           />
 
-          <Text style={styles.label}>Your City</Text>
-          <View style={[styles.inputWrapper, { backgroundColor: theme.background, borderColor: theme.border, marginBottom: 15 }]}>
-            <MapPin size={18} color={theme.textMuted} style={{ marginRight: 10 }} />
-            <TextInput
-              style={{ flex: 1, height: 45, color: theme.text }}
-              value={formData.city}
-              onChangeText={(text) => setFormData({...formData, city: text})}
-              placeholder="e.g. San Francisco"
-              placeholderTextColor={theme.textMuted}
-            />
-          </View>
+          <Input
+            label="Home City"
+            leftIcon={<MapPin size={20} color={theme.primary} />}
+            value={formData.city}
+            onChangeText={(text) => setFormData({...formData, city: text})}
+            placeholder="e.g. San Francisco"
+          />
 
-          <Text style={styles.label}>Bio</Text>
-          <TextInput
-            style={[styles.input, styles.textArea, { backgroundColor: theme.background, borderColor: theme.border, color: theme.text }]}
+          <Input
+            label="Bio"
             value={formData.bio}
             onChangeText={(text) => setFormData({...formData, bio: text})}
-            placeholder="Tell others about yourself..."
-            placeholderTextColor={theme.textMuted}
+            placeholder="Share a bit about yourself with the community..."
             multiline
             numberOfLines={4}
           />
-        </View>
+        </Card>
 
-        <View style={[styles.section, { backgroundColor: theme.surface, borderColor: theme.border }]}>
-          <View style={styles.sectionHeader}>
-            <Car size={18} color={theme.text} />
-            <Text style={[styles.sectionTitle, { color: theme.text }]}>Vehicle Details</Text>
-          </View>
-          <Text style={[styles.sectionSub, { color: theme.textMuted }]}>Required to offer rides</Text>
-          
-          <Text style={styles.label}>Model</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: theme.background, borderColor: theme.border, color: theme.text }]}
+        <Card 
+          title="Vehicle Details" 
+          subTitle="Add your car info to start hosting rides"
+          icon={<Car size={20} color={theme.text} />}
+          style={styles.card}
+          delay={600}
+        >
+          <Input
+            label="Vehicle Model"
             value={formData.vehicleModel}
             onChangeText={(text) => setFormData({...formData, vehicleModel: text})}
             placeholder="e.g. Tesla Model 3"
-            placeholderTextColor={theme.textMuted}
           />
 
           <View style={styles.row}>
-            <View style={{ flex: 1, marginRight: 10 }}>
-              <Text style={styles.label}>Color</Text>
-              <TextInput
-                style={[styles.input, { backgroundColor: theme.background, borderColor: theme.border, color: theme.text }]}
+            <View style={{ flex: 1, marginRight: 12 }}>
+              <Input
+                label="Color"
                 value={formData.vehicleColor}
                 onChangeText={(text) => setFormData({...formData, vehicleColor: text})}
                 placeholder="e.g. Silver"
-                placeholderTextColor={theme.textMuted}
               />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.label}>License Plate</Text>
-              <TextInput
-                style={[styles.input, { backgroundColor: theme.background, borderColor: theme.border, color: theme.text }]}
+              <Input
+                label="License Plate"
                 value={formData.vehiclePlate}
                 onChangeText={(text) => setFormData({...formData, vehiclePlate: text})}
                 placeholder="e.g. ABC-1234"
-                placeholderTextColor={theme.textMuted}
               />
             </View>
           </View>
-        </View>
+        </Card>
 
-        <TouchableOpacity 
-          style={[styles.saveButton, { backgroundColor: isDark ? theme.primary : '#111827' }]} 
-          onPress={handleSubmit}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color={isDark ? '#000' : '#fff'} />
-          ) : (
-            <>
-              <Save size={20} color={isDark ? '#000' : '#fff'} />
-              <Text style={[styles.saveButtonText, { color: isDark ? '#000' : '#fff' }]}>Save Profile</Text>
-            </>
-          )}
-        </TouchableOpacity>
+        <Animated.View entering={FadeInDown.delay(700).duration(800).springify()}>
+          <Button 
+            label="Save Changes" 
+            variant="black"
+            size="lg"
+            icon={<Save size={22} color={isDark ? theme.primary : '#fff'} />}
+            onPress={handleSubmit}
+            isLoading={isSubmitting}
+            style={styles.saveButton}
+          />
+        </Animated.View>
 
-        <TouchableOpacity 
-          style={[styles.logoutButton, { marginTop: 20 }]} 
-          onPress={signOut}
-        >
-          <LogOut size={20} color="#ef4444" />
-          <Text style={styles.logoutButtonText}>Sign Out</Text>
-        </TouchableOpacity>
+        <Animated.View entering={FadeInDown.delay(800).duration(800).springify()}>
+          <Button 
+            label="Sign Out" 
+            variant="danger"
+            size="md"
+            icon={<LogOut size={20} color="#ef4444" />}
+            onPress={signOut}
+            style={styles.logoutButton}
+          />
+        </Animated.View>
         
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -228,108 +235,54 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 20,
+    padding: 24,
   },
   profileHeader: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 32,
   },
   avatarCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 30,
+    width: 100,
+    height: 100,
+    borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 15,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 5,
+    marginBottom: 20,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
+    elevation: 10,
   },
   userName: {
-    fontSize: 24,
-    fontWeight: '800',
+    fontSize: 28,
+    fontWeight: '900',
+    letterSpacing: -0.5,
   },
   userEmail: {
-    fontSize: 14,
-    marginTop: 4,
-  },
-  section: {
-    borderRadius: 24,
-    padding: 20,
-    marginBottom: 20,
-    borderWidth: 1,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
-    gap: 8,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  sectionSub: {
-    fontSize: 12,
-    marginTop: -10,
-    marginBottom: 15,
-  },
-  label: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: '#9ca3af',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 8,
-    marginLeft: 4,
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 12,
     fontSize: 16,
-    marginBottom: 15,
+    fontWeight: '600',
+    marginTop: 6,
   },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-  },
-  textArea: {
-    minHeight: 100,
-    textAlignVertical: 'top',
+  card: {
+    borderRadius: 32,
+    borderWidth: 0,
+    marginBottom: 24,
+    padding: 24,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
   },
   row: {
     flexDirection: 'row',
   },
   saveButton: {
-    borderRadius: 16,
-    height: 55,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 10,
-    marginTop: 10,
-  },
-  saveButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
+    marginTop: 8,
+    borderRadius: 20,
   },
   logoutButton: {
-    backgroundColor: '#fee2e2',
-    borderRadius: 16,
-    height: 55,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 10,
-  },
-  logoutButtonText: {
-    color: '#ef4444',
-    fontSize: 16,
-    fontWeight: '700',
+    marginTop: 20,
+    borderRadius: 20,
   },
 });

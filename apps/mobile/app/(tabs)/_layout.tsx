@@ -10,7 +10,7 @@ export default function TabsLayout() {
     <Tabs 
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: theme.isDark ? theme.primary : '#000',
+        tabBarActiveTintColor: isDark ? theme.primary : '#000',
         tabBarInactiveTintColor: theme.textMuted,
         tabBarStyle: {
           borderTopWidth: 1,
@@ -32,7 +32,7 @@ export default function TabsLayout() {
           title: 'Home',
           tabBarLabel: 'Dashboard',
           tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.tabIconContainer, focused && { backgroundColor: theme.isDark ? 'rgba(190, 242, 100, 0.1)' : 'rgba(190, 242, 100, 0.2)' }]}>
+            <View style={[styles.tabIconContainer, focused && { backgroundColor: isDark ? 'rgba(190, 242, 100, 0.1)' : 'rgba(190, 242, 100, 0.2)' }]}>
               <LayoutDashboard size={24} color={color} />
             </View>
           ),
@@ -44,7 +44,7 @@ export default function TabsLayout() {
           title: 'Find a Ride',
           tabBarLabel: 'Search',
           tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.tabIconContainer, focused && { backgroundColor: theme.isDark ? 'rgba(190, 242, 100, 0.1)' : 'rgba(190, 242, 100, 0.2)' }]}>
+            <View style={[styles.tabIconContainer, focused && { backgroundColor: isDark ? 'rgba(190, 242, 100, 0.1)' : 'rgba(190, 242, 100, 0.2)' }]}>
               <Search size={24} color={color} />
             </View>
           ),
@@ -56,7 +56,7 @@ export default function TabsLayout() {
           title: 'Offer a Ride',
           tabBarLabel: 'Offer',
           tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.tabIconContainer, focused && { backgroundColor: theme.isDark ? 'rgba(190, 242, 100, 0.1)' : 'rgba(190, 242, 100, 0.2)' }]}>
+            <View style={[styles.tabIconContainer, focused && { backgroundColor: isDark ? 'rgba(190, 242, 100, 0.1)' : 'rgba(190, 242, 100, 0.2)' }]}>
               <PlusCircle size={24} color={color} />
             </View>
           ),
@@ -68,7 +68,7 @@ export default function TabsLayout() {
           title: 'My Profile',
           tabBarLabel: 'Profile',
           tabBarIcon: ({ color, focused }) => (
-            <View style={[styles.tabIconContainer, focused && { backgroundColor: theme.isDark ? 'rgba(190, 242, 100, 0.1)' : 'rgba(190, 242, 100, 0.2)' }]}>
+            <View style={[styles.tabIconContainer, focused && { backgroundColor: isDark ? 'rgba(190, 242, 100, 0.1)' : 'rgba(190, 242, 100, 0.2)' }]}>
               <User size={24} color={color} />
             </View>
           ),

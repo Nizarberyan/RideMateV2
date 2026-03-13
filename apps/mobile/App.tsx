@@ -15,6 +15,7 @@ import { Car, MapPin, Leaf, LogOut, User as UserIcon } from 'lucide-react-native
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
+
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 const client = createClient({
@@ -28,6 +29,8 @@ export default function App() {
   const [rides, setRides] = useState<Ride[]>([]);
   const [email, setEmail] = useState('jane@example.com');
   const [password, setPassword] = useState('password123');
+
+  console.log("API URL:", API_URL);
 
   useEffect(() => {
     checkAuth();

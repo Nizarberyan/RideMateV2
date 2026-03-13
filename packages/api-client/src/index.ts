@@ -30,6 +30,7 @@ export type Ride = {
 export type Booking = {
   id: string;
   userId: string;
+  user?: User;
   rideId: string;
   seatsBooked: number;
   status: string;
@@ -143,9 +144,23 @@ export const createClient = (options: ClientOptions) => {
         method: "POST",
         body: JSON.stringify(data),
       }),
+      update: (id: string, data: Partial<CreateRideInput>): Promise<Ride> => fetchApi(`/rides/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      }),
+      delete: (id: string): Promise<void> => fetchApi(`/rides/${id}`, {
+        method: "DELETE",
+      }),
     },
     bookings: {
       getMine: (): Promise<Booking[]> => fetchApi("/bookings"),
+      create: (data: { rideId: string; seatsBooked: number; pickupLocation?: string; dropoffLocation?: string }): Promise<Booking> => fetchApi("/bookings", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+      cancel: (id: string): Promise<void> => fetchApi(`/bookings/${id}`, {
+        method: "DELETE",
+      }),
     },
   };
 };

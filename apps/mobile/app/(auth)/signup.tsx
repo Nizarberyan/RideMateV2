@@ -14,28 +14,36 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { Button, Input } from '../../components/ui';
+import { UserPlus } from 'lucide-react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
-export default function Login() {
+export default function Signup() {
   const { signIn, client } = useAuth();
   const { theme } = useTheme();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState('jane@example.com');
-  const [password, setPassword] = useState('password123');
+  
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Please enter both email and password");
+  const handleSignup = async () => {
+    if (!name || !email || !password) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert("Error", "Password must be at least 6 characters");
       return;
     }
 
     setIsLoading(true);
     try {
-      const data = await client.auth.login({ email, password });
+      const data = await client.auth.register({ name, email, password });
       await signIn(data);
     } catch (e: any) {
-      Alert.alert("Login Failed", e.message || "Invalid credentials");
+      Alert.alert("Signup Failed", e.message || "Failed to create account");
     } finally {
       setIsLoading(false);
     }
@@ -64,13 +72,31 @@ export default function Login() {
               entering={FadeInDown.delay(400).duration(800).springify()}
               style={[styles.loginTitle, { color: theme.text }]}
             >
-              Welcome to RideMate
+              Create account
+            </Animated.Text>
+            
+            <Animated.Text 
+              entering={FadeInDown.delay(500).duration(800).springify()}
+              style={[styles.loginSub, { color: theme.textMuted }]}
+            >
+              Join the community. Build. Explore. Ship.
             </Animated.Text>
             
             <View style={styles.form}>
               <Animated.View entering={FadeInDown.delay(600).duration(800).springify()}>
                 <Input
-                  placeholder="Email Address"
+                  label="Full Name"
+                  placeholder="John Doe"
+                  value={name}
+                  onChangeText={setName}
+                  autoComplete="name"
+                />
+              </Animated.View>
+              
+              <Animated.View entering={FadeInDown.delay(700).duration(800).springify()}>
+                <Input
+                  label="Email"
+                  placeholder="name@example.com"
                   value={email}
                   onChangeText={setEmail}
                   autoCapitalize="none"
@@ -79,35 +105,38 @@ export default function Login() {
                 />
               </Animated.View>
               
-              <Animated.View entering={FadeInDown.delay(700).duration(800).springify()}>
+              <Animated.View entering={FadeInDown.delay(800).duration(800).springify()}>
                 <Input
-                  placeholder="Password"
+                  label="Password"
+                  placeholder="••••••••"
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry
                   autoCapitalize="none"
-                  autoComplete="password"
+                  autoComplete="password-new"
+                  helperText="Minimum 6 characters"
                 />
               </Animated.View>
               
-              <Animated.View entering={FadeInDown.delay(800).duration(800).springify()}>
+              <Animated.View entering={FadeInDown.delay(900).duration(800).springify()}>
                 <Button 
-                  label="Sign In" 
+                  label="Sign Up" 
                   variant="black"
                   size="lg"
-                  onPress={handleLogin}
+                  onPress={handleSignup}
                   isLoading={isLoading}
+                  icon={<UserPlus size={20} color="#ffffff" />}
                   style={{ marginTop: 12 }}
                 />
               </Animated.View>
 
-              <Animated.View entering={FadeInDown.delay(1000).duration(800).springify()}>
+              <Animated.View entering={FadeInDown.delay(1100).duration(800).springify()}>
                 <TouchableOpacity 
-                  onPress={() => router.replace('/(auth)/signup')}
+                  onPress={() => router.replace('/(auth)/login')}
                   style={styles.linkButton}
                 >
                   <Text style={[styles.linkText, { color: theme.textMuted }]}>
-                    Don't have an account? <Text style={{ color: theme.text, fontWeight: '900' }}>Sign up</Text>
+                    Already have an account? <Text style={{ color: theme.text, fontWeight: '900' }}>Sign in</Text>
                   </Text>
                 </TouchableOpacity>
               </Animated.View>
@@ -154,8 +183,14 @@ const styles = StyleSheet.create({
   loginTitle: {
     fontSize: 32,
     fontWeight: '900',
-    marginBottom: 40,
+    marginBottom: 8,
     letterSpacing: -1,
+    textAlign: 'center',
+  },
+  loginSub: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 40,
     textAlign: 'center',
   },
   form: {

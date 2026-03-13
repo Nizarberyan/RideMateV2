@@ -4,24 +4,24 @@ import * as SecureStore from 'expo-secure-store';
 
 export const Colors = {
   light: {
-    background: '#f9fafb',
+    background: '#FFFEE9', // Beige Brand
     surface: '#ffffff',
-    text: '#111827',
-    textMuted: '#6b7280',
-    primary: '#bef264', // Lime
-    border: '#f3f4f6',
+    text: '#151515',    // Black Brand
+    textMuted: '#6B7280', // Refined Gray
+    primary: '#C1F11D',  // Lime Brand
+    border: '#E5E7EB',
     input: '#ffffff',
     tabBar: '#ffffff',
   },
   dark: {
-    background: '#000000',
-    surface: '#111827',
-    text: '#f9fafb',
-    textMuted: '#9ca3af',
-    primary: '#bef264',
-    border: '#1f2937',
-    input: '#1f2937',
-    tabBar: '#111827',
+    background: '#0F0F0F', // Deeper Black
+    surface: '#1A1A1A',    // Deep Gray
+    text: '#F9FAFB',       // Clean Off-white
+    textMuted: '#9CA3AF',  // Better contrast gray
+    primary: '#C1F11D',    // Lime Brand
+    border: '#262626',
+    input: '#1A1A1A',
+    tabBar: '#1A1A1A',
   }
 };
 

@@ -3,18 +3,16 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
+import { BrandLogo, Button } from "@repo/ui";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden font-sans">
       {/* Navbar matching the design */}
       <nav className="w-full z-50 md:px-16 px-6 py-6 flex justify-between items-center transition-all">
-        <div className="text-2xl font-bold flex items-center gap-2 text-black-brand">
-          <div className="bg-lime-brand text-black-brand px-2 py-0.5 rounded-md text-xl font-extrabold flex items-center justify-center">
-            RM
-          </div>
-          <span className="tracking-tight">RideMate</span>
-        </div>
+        <Link href="/">
+          <BrandLogo />
+        </Link>
 
         <div className="hidden md:flex gap-8 text-black-brand font-medium text-sm">
           <Link
@@ -41,29 +39,17 @@ export default function Home() {
           >
             Roadmap
           </Link>
-          <Link
-            href="#more"
-            className="hover:text-lime-brand transition-colors flex items-center gap-1"
-          >
-            More <span className="text-xs">▼</span>
-          </Link>
         </div>
 
         <div className="flex items-center gap-4">
           <button className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-brand/30 text-sm font-medium hover:bg-black/5 transition-colors">
             🇬🇧 EN <span className="text-xs">▼</span>
           </button>
-          <Link
-            href="/login"
-            className="px-5 py-2.5 rounded-full border border-gray-brand/30 text-black-brand font-bold text-sm hover:bg-black/5 active:scale-95 transition-all"
-          >
-            Log in
+          <Link href="/login">
+            <Button variant="outline">Log in</Button>
           </Link>
-          <Link
-            href="/register"
-            className="px-5 py-2.5 rounded-full bg-lime-brand text-black-brand font-bold text-sm shadow-sm hover:brightness-95 active:scale-95 transition-all"
-          >
-            Sign up
+          <Link href="/register">
+            <Button variant="primary">Sign up</Button>
           </Link>
         </div>
       </nav>
@@ -89,9 +75,9 @@ export default function Home() {
               service.
             </p>
 
-            <button className="px-8 py-3 bg-lime-brand text-black-brand rounded-xl font-bold text-sm shadow-sm hover:brightness-95 transition-all active:scale-95 mb-16">
+            <Button size="lg" className="px-8 mb-16">
               View Source Code
-            </button>
+            </Button>
 
             <div className="flex gap-12 text-black-brand">
               <div>
@@ -331,9 +317,7 @@ export default function Home() {
                 our safety guide carefully. Your security is incredibly
                 important to us.
               </p>
-              <button className="px-6 py-2.5 bg-lime-brand text-black-brand font-bold text-sm rounded-full shadow-sm hover:brightness-95 transition-all">
-                Learn more
-              </button>
+              <Button>Learn more</Button>
             </div>
           </div>
 
@@ -368,9 +352,9 @@ export default function Home() {
                 experimental app.
               </p>
             </div>
-            <button className="px-6 py-2.5 bg-lime-brand text-black-brand font-bold text-sm rounded-full shadow-sm hover:brightness-95 transition-all hidden md:block">
+            <Button className="hidden md:block">
               View Documentation
-            </button>
+            </Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -432,9 +416,9 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <button className="px-6 py-2.5 bg-lime-brand text-black-brand font-bold text-sm rounded-full shadow-sm hover:brightness-95 transition-all md:hidden mt-8 w-full">
+          <Button className="md:hidden mt-8 w-full">
             View Documentation
-          </button>
+          </Button>
         </div>
       </section>
 
@@ -561,9 +545,9 @@ export default function Home() {
               The technical journey of developing an experimental mobility
               platform from scratch.
             </p>
-            <button className="px-8 py-3 bg-black text-white rounded-xl font-bold text-sm shadow-sm hover:brightness-95 transition-all">
+            <Button variant="black">
               View GitHub Repo
-            </button>
+            </Button>
           </div>
           <div className="flex-1 w-full h-[300px] md:h-auto relative bg-lime-brand flex items-end justify-center md:justify-end -mr-16 -mb-8">
             <Image
@@ -580,12 +564,9 @@ export default function Home() {
       {/* Minimal Footer */}
       <footer className="w-full bg-[#151515] text-white py-16 px-6 md:px-16">
         <div className="max-w-7xl mx-auto border-t border-white/10 pt-16 flex justify-between items-center flex-col md:flex-row">
-          <div className="text-2xl font-bold flex items-center gap-2 mb-8 md:mb-0">
-            <div className="bg-lime-brand text-black-brand px-2 py-0.5 rounded-md text-xl font-extrabold flex items-center justify-center">
-              RM
-            </div>
-            <span className="tracking-tight">RideMate</span>
-          </div>
+          <Link href="/">
+            <BrandLogo size="md" className="text-white" />
+          </Link>
 
           <div className="text-sm text-gray-400 font-medium">
             © 2024 RideMate. Concept Demo Project.
