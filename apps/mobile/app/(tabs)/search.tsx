@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Search as SearchIcon, MapPin, Calendar, Users, ArrowRight, X } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 import { Ride } from '@repo/api-client';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -24,6 +25,7 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 const { width } = Dimensions.get('window');
 
 export default function SearchScreen() {
+  const router = useRouter();
   const { client, user } = useAuth();
   const { theme, isDark } = useTheme();
   const insets = useSafeAreaInsets();
@@ -57,7 +59,12 @@ export default function SearchScreen() {
 
   const loadInitialRides = useCallback(async () => {
     try {
-      const initialRides = await client.rides.getAll({ city: user?.city || undefined });
+      const initialRides = await client.rides.getAll({ 
+        city: user?.city || undefined,
+        radius: user?.radius || undefined,
+        lat: user?.latitude || undefined,
+        lng: user?.longitude || undefined
+      });
       setRides(initialRides);
       setIsSearching(false);
     } catch (e) {
@@ -243,7 +250,7 @@ export default function SearchScreen() {
               rides.map((ride, index) => (
                 <Card
                   key={ride.id}
-                  onPress={() => {}}
+                  onPress={() => router.push(`/rides/${ride.id}`)}
                   contentStyle={{ padding: 0 }}
                   style={styles.rideCard}
                   delay={800 + (index * 100)}

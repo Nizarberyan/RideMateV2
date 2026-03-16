@@ -8,6 +8,7 @@ import {
   RefreshControl
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { Ride } from '@repo/api-client';
 import { Car, Leaf, ArrowRight } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
@@ -17,6 +18,7 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 export default function Dashboard() {
   const { user, client } = useAuth();
+  const router = useRouter();
   const { theme, isDark } = useTheme();
   const insets = useSafeAreaInsets();
   const [rides, setRides] = useState<Ride[]>([]);
@@ -118,12 +120,13 @@ export default function Dashboard() {
                 style={styles.rideCard}
                 contentStyle={{ padding: 0 }}
                 delay={600 + (index * 100)}
+                onPress={() => router.push(`/rides/${ride.id}`)}
               >
                 <View style={styles.cardHeader}>
-                  <View style={styles.locationRow}>
-                    <Text style={[styles.locationText, { color: theme.text }]}>{ride.startLocation}</Text>
-                    <ArrowRight size={16} color={theme.textMuted} style={{ marginHorizontal: 10 }} />
-                    <Text style={[styles.locationText, { color: theme.text }]}>{ride.endLocation}</Text>
+                  <View style={[styles.locationRow, { marginRight: 12 }]}>
+                    <Text style={[styles.locationText, { color: theme.text }]} numberOfLines={1} ellipsizeMode="tail">{ride.startLocation}</Text>
+                    <ArrowRight size={16} color={theme.textMuted} style={{ marginHorizontal: 8, flexShrink: 0 }} />
+                    <Text style={[styles.locationText, { color: theme.text }]} numberOfLines={1} ellipsizeMode="tail">{ride.endLocation}</Text>
                   </View>
                   <View style={[styles.statusBadge, { backgroundColor: isDark ? 'rgba(193, 241, 29, 0.15)' : 'rgba(193, 241, 29, 0.3)' }]}>
                     <Text style={[styles.statusText, { color: isDark ? theme.primary : '#4d7c0f' }]}>{ride.status.toUpperCase()}</Text>
@@ -237,6 +240,7 @@ const styles = StyleSheet.create({
   locationText: {
     fontSize: 18,
     fontWeight: '900',
+    flexShrink: 1,
   },
   statusBadge: {
     paddingHorizontal: 10,

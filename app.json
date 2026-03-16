@@ -1,0 +1,8 @@
+{
+  "android": {
+    "package": "com.nizarberiane.ridemate"
+  },
+  "ios": {
+    "bundleIdentifier": "com.nizarberiane.ridemate"
+  }
+}

@@ -24,6 +24,9 @@ model User {
   role          Role     @default(USER)
   carbonSavedKg Float    @default(0)
   city          String?
+  latitude      Float?
+  longitude     Float?
+  radius        Float    @default(50)
   
   // Refresh Token
   refreshToken  String?
@@ -50,7 +53,11 @@ model Ride {
   driverId          String
   driver            User       @relation("DriverRides", fields: [driverId], references: [id])
   startLocation     String
+  startLat          Float?
+  startLng          Float?
   endLocation       String
+  endLat            Float?
+  endLng            Float?
   departureDatetime DateTime
   availableSeats    Int
   status            RideStatus @default(ACTIVE)

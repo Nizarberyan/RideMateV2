@@ -37,8 +37,19 @@ export class RidesController {
     @Query("to") to?: string,
     @Query("date") date?: string,
     @Query("city") city?: string,
+    @Query("lat") lat?: string,
+    @Query("lng") lng?: string,
+    @Query("radius") radius?: string,
   ) {
-    return this.ridesService.findAll({ from, to, date, city });
+    return this.ridesService.findAll({ 
+      from, 
+      to, 
+      date, 
+      city, 
+      lat: lat ? parseFloat(lat) : undefined, 
+      lng: lng ? parseFloat(lng) : undefined, 
+      radius: radius ? parseFloat(radius) : undefined 
+    });
   }
 
   @Get(":id")

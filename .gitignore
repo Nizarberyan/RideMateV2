@@ -40,3 +40,6 @@ yarn-error.log*
 legacy
 tasks.md
 GEMINI.md
+android
+ios
+macos

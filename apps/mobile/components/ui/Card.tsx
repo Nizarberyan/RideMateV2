@@ -63,25 +63,8 @@ export const Card = ({
     }
   };
 
-  const Container = onPress ? AnimatedPressable : Animated.View;
-
-  return (
-    <Container 
-      entering={FadeInDown.delay(delay).duration(600).springify()}
-      style={[
-        styles.card, 
-        { 
-          backgroundColor: theme.surface, 
-          borderColor: theme.border,
-          shadowColor: '#000',
-        }, 
-        animatedStyle,
-        style
-      ]}
-      onPress={onPress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-    >
+  const innerContent = (
+    <>
       {(title || icon) && (
         <View style={[styles.header, headerStyle]}>
           {icon && <View style={styles.iconContainer}>{icon}</View>}
@@ -102,7 +85,37 @@ export const Card = ({
       <View style={[styles.content, contentStyle]}>
         {children}
       </View>
-    </Container>
+    </>
+  );
+
+  const cardStyle = [
+    styles.card, 
+    { 
+      backgroundColor: theme.surface, 
+      borderColor: theme.border,
+      shadowColor: '#000',
+    }, 
+    animatedStyle,
+    style
+  ];
+
+  return (
+    <Animated.View entering={FadeInDown.delay(delay).duration(600).springify()}>
+      {onPress ? (
+        <AnimatedPressable 
+          style={cardStyle}
+          onPress={onPress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+        >
+          {innerContent}
+        </AnimatedPressable>
+      ) : (
+        <Animated.View style={cardStyle}>
+          {innerContent}
+        </Animated.View>
+      )}
+    </Animated.View>
   );
 };
 

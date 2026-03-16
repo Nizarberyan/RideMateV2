@@ -12,9 +12,25 @@ export class CreateRideDto {
   @IsString()
   startLocation!: string;
 
+  @IsOptional()
+  @IsNumber()
+  startLat?: number;
+
+  @IsOptional()
+  @IsNumber()
+  startLng?: number;
+
   @IsNotEmpty()
   @IsString()
   endLocation!: string;
+
+  @IsOptional()
+  @IsNumber()
+  endLat?: number;
+
+  @IsOptional()
+  @IsNumber()
+  endLng?: number;
 
   @IsNotEmpty()
   @IsDateString()

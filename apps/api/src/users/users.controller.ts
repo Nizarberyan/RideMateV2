@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Patch,
+  Param,
   Body,
   UseGuards,
   Request,
@@ -23,5 +24,15 @@ export class UsersController {
   @Patch("profile")
   updateProfile(@Request() req: any, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(req.user.id, updateUserDto);
+  }
+
+  @Get(":id")
+  async findOne(@Param("id") id: string) {
+    const user = await this.usersService.findById(id);
+    if (!user) return null;
+    
+    // Omit sensitive data
+    const { password, refreshToken, ...publicUser } = user as any;
+    return publicUser;
   }
 }

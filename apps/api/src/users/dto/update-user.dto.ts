@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsUrl } from "class-validator";
+import { IsOptional, IsString, IsUrl, IsNumber } from "class-validator";
 
 export class UpdateUserDto {
   @IsOptional()
@@ -16,6 +16,18 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   city?: string;
+
+  @IsOptional()
+  @IsNumber()
+  latitude?: number;
+
+  @IsOptional()
+  @IsNumber()
+  longitude?: number;
+
+  @IsOptional()
+  @IsNumber()
+  radius?: number;
 
   @IsOptional()
   @IsString()

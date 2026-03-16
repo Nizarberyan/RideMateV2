@@ -32,7 +32,29 @@ export class RidesService {
     });
   }
 
-  async findAll(filters?: { from?: string; to?: string; date?: string; city?: string }) {
+  async findAll(filters?: { from?: string; to?: string; date?: string; city?: string; lat?: number; lng?: number; radius?: number }) {
+    if (filters?.lat && filters?.lng && filters?.radius) {
+      // Radius search using Haversine formula directly in SQL since PostGIS was not available in migration
+      const radius = filters.radius; // in km
+      const lat = filters.lat;
+      const lng = filters.lng;
+
+      // SQL query to find rides within radius
+      // distance = 6371 * acos(cos(radians(lat)) * cos(radians(startLat)) * cos(radians(startLng) - radians(lng)) + sin(radians(lat)) * sin(radians(startLat)))
+      return this.prisma.$queryRaw`
+        SELECT r.*, 
+          u.name as "driverName", u.photo as "driverPhoto", 
+          u."vehicleModel", u."vehicleColor", u."vehiclePlate",
+          (6371 * acos(cos(radians(${lat})) * cos(radians("startLat")) * cos(radians("startLng") - radians(${lng})) + sin(radians(${lat})) * sin(radians("startLat")))) AS "distanceKm"
+        FROM "Ride" r
+        JOIN "User" u ON r."driverId" = u.id
+        WHERE r.status = 'ACTIVE'
+        AND (6371 * acos(cos(radians(${lat})) * cos(radians("startLat")) * cos(radians("startLng") - radians(${lng})) + sin(radians(${lat})) * sin(radians("startLat")))) <= ${radius}
+        ORDER BY "distanceKm" ASC
+        LIMIT 20
+      `;
+    }
+
     const where: any = {
       status: 'ACTIVE',
     };
@@ -92,6 +114,17 @@ export class RidesService {
             vehicleModel: true,
             vehicleColor: true,
             vehiclePlate: true,
+          },
+        },
+        bookings: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                photo: true,
+              },
+            },
           },
         },
       },

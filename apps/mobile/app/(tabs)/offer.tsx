@@ -9,18 +9,20 @@ import {
   Platform,
   Modal,
   Dimensions,
-  TouchableOpacity
+  TouchableOpacity,
+  KeyboardAvoidingView
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Car, MapPin, Calendar, Plus, AlertCircle, CheckCircle2, Clock, X } from 'lucide-react-native';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { Car, MapPin, Map, Calendar, Plus, AlertCircle, CheckCircle2, Clock, X } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../../context/ThemeContext';
 import { Button, Input, Card } from '../../components/ui';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import * as Location from 'expo-location';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 export default function OfferRide() {
   const { user, client } = useAuth();
@@ -38,10 +40,27 @@ export default function OfferRide() {
     distanceKm: '',
   });
 
+  const [startCoords, setStartCoords] = useState<{ latitude: number, longitude: number } | null>(null);
+  const [endCoords, setEndCoords] = useState<{ latitude: number, longitude: number } | null>(null);
+  const [mapModalVisible, setMapModalVisible] = useState(false);
+  const [pickingMode, setPickingMode] = useState<'start' | 'end'>('start');
+  const [mapRegion, setMapRegion] = useState({
+    latitude: 37.78825,
+    longitude: -122.4324,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
+
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [timePickerMode, setTimePickerMode] = useState<'hours' | 'minutes'>('hours');
   const [dateSelected, setDateSelected] = useState(false);
+
+  // Clock UI constants
+  const CLOCK_RADIUS = width * 0.35;
+  const NUMBER_RADIUS = CLOCK_RADIUS - 30;
+
 
   // Custom Date Options
   const calendarDays = useMemo(() => {
@@ -57,20 +76,68 @@ export default function OfferRide() {
 
   const hasVehicle = !!(user?.vehicleModel && user?.vehiclePlate);
 
-  const onTimeChange = (event: DateTimePickerEvent, selectedTime?: Date) => {
-    setShowTimePicker(false);
-    if (selectedTime) {
-      const newDate = new Date(date);
-      newDate.setHours(selectedTime.getHours());
-      newDate.setMinutes(selectedTime.getMinutes());
-      setDate(newDate);
-      setDateSelected(true);
+  const openMap = async (mode: 'start' | 'end') => {
+    setPickingMode(mode);
+    setMapModalVisible(true);
+    
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') return;
+
+      const lastKnown = await Location.getLastKnownPositionAsync({});
+      if (lastKnown) {
+        setMapRegion({
+          ...mapRegion,
+          latitude: lastKnown.coords.latitude,
+          longitude: lastKnown.coords.longitude,
+        });
+      }
+
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+        timeout: 5000,
+      });
+      
+      if (location) {
+        setMapRegion({
+          ...mapRegion,
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+      }
+    } catch (e) {
+      console.log("Location fetch skipped or failed");
     }
   };
 
+  const handleMapConfirm = async () => {
+    const coords = { latitude: mapRegion.latitude, longitude: mapRegion.longitude };
+    if (pickingMode === 'start') {
+      setStartCoords(coords);
+      // Try to get address name
+      try {
+        const address = await Location.reverseGeocodeAsync(coords);
+        if (address[0]) {
+          const name = `${address[0].name || ''} ${address[0].street || ''}, ${address[0].city || ''}`.trim();
+          setFormData({ ...formData, startLocation: name });
+        }
+      } catch (e) {}
+    } else {
+      setEndCoords(coords);
+      try {
+        const address = await Location.reverseGeocodeAsync(coords);
+        if (address[0]) {
+          const name = `${address[0].name || ''} ${address[0].street || ''}, ${address[0].city || ''}`.trim();
+          setFormData({ ...formData, endLocation: name });
+        }
+      } catch (e) {}
+    }
+    setMapModalVisible(false);
+  };
+
   const handleSubmit = async () => {
-    if (!formData.startLocation || !formData.endLocation || !dateSelected) {
-      Alert.alert("Required Fields", "Please select a valid date and time for your ride.");
+    if (!formData.startLocation || !formData.endLocation || !dateSelected || !formData.availableSeats) {
+      Alert.alert("Missing Information", "Please fill in all details including departure, destination, date, and seats.");
       return;
     }
 
@@ -78,7 +145,11 @@ export default function OfferRide() {
     try {
       await client.rides.create({
         startLocation: formData.startLocation,
+        startLat: startCoords?.latitude,
+        startLng: startCoords?.longitude,
         endLocation: formData.endLocation,
+        endLat: endCoords?.latitude,
+        endLng: endCoords?.longitude,
         departureDatetime: date.toISOString(),
         availableSeats: parseInt(formData.availableSeats),
         description: formData.description,
@@ -95,6 +166,8 @@ export default function OfferRide() {
           description: '',
           distanceKm: '',
         });
+        setStartCoords(null);
+        setEndCoords(null);
         setDate(new Date());
         setDateSelected(false);
         router.push('/(tabs)');
@@ -109,19 +182,29 @@ export default function OfferRide() {
   if (success) {
     return (
       <View style={[styles.center, { backgroundColor: theme.background }]}>
-        <CheckCircle2 size={64} color={theme.primary} />
-        <Text style={[styles.successTitle, { color: theme.text }]}>Ride Offered!</Text>
-        <Text style={[styles.successSub, { color: theme.textMuted }]}>Redirecting to dashboard...</Text>
+        <Animated.View entering={FadeInUp.springify().damping(15)}>
+          <CheckCircle2 size={80} color={theme.primary} />
+        </Animated.View>
+        <Animated.Text entering={FadeInUp.delay(100).springify().damping(15)} style={[styles.successTitle, { color: theme.text }]}>
+          Ride Offered!
+        </Animated.Text>
+        <Animated.Text entering={FadeInUp.delay(200).springify().damping(15)} style={[styles.successSub, { color: theme.textMuted }]}>
+          Redirecting to your dashboard...
+        </Animated.Text>
       </View>
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.primary }]}>
+    <KeyboardAvoidingView 
+      style={[styles.container, { backgroundColor: theme.primary }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { backgroundColor: theme.background, flexGrow: 1, paddingTop: insets.top + 20 }]}
+        contentContainerStyle={[styles.scrollContent, { backgroundColor: theme.background, flexGrow: 1, paddingTop: insets.top + 20, paddingBottom: 100 }]}
+        keyboardShouldPersistTaps="handled"
       >
-        <View style={{ backgroundColor: theme.primary, position: 'absolute', top: -(insets.top + 20), left: 0, right: 0, height: insets.top + 20 + 80, borderBottomLeftRadius: 40, borderBottomRightRadius: 40 }} />
+        <View style={{ backgroundColor: theme.primary, position: 'absolute', top: -(insets.top + 20), left: 0, right: 0, height: insets.top + 20 + 90, borderBottomLeftRadius: 40, borderBottomRightRadius: 40 }} />
         <View style={{ padding: 24, paddingTop: 0 }}>
           <Animated.Text 
             entering={FadeInUp.delay(200).duration(800).springify()}
@@ -149,32 +232,52 @@ export default function OfferRide() {
               </View>
             </Card>
           ) : (
-            <View style={styles.form}>
+            <View style={styles.form} pointerEvents={isSubmitting ? "none" : "auto"}>
               <Animated.Text 
                 entering={FadeInUp.delay(300).duration(800).springify()}
-                style={[styles.formSubtitle, { color: isDark ? 'rgba(21, 21, 21, 0.6)' : 'rgba(21, 21, 21, 0.5)', fontWeight: '900', marginBottom: 32, letterSpacing: 1 }]}
+                style={[styles.formSubtitle, { color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(21, 21, 21, 0.5)', fontWeight: '900', marginBottom: 32, letterSpacing: 1 }]}
               >
                 FILL IN THE TRIP DETAILS
               </Animated.Text>
 
               <Animated.View entering={FadeInDown.delay(400).duration(800).springify()}>
-                <Input
-                  label="Departure Location"
-                  leftIcon={<MapPin size={20} color={theme.primary} />}
-                  value={formData.startLocation}
-                  onChangeText={(text) => setFormData({ ...formData, startLocation: text })}
-                  placeholder="e.g. San Francisco"
-                />
+                <View style={styles.inputWithButton}>
+                  <View style={{ flex: 1 }}>
+                    <Input
+                      label="Departure Location"
+                      leftIcon={<MapPin size={20} color={theme.primary} />}
+                      value={formData.startLocation}
+                      onChangeText={(text) => setFormData({ ...formData, startLocation: text })}
+                      placeholder="e.g. San Francisco"
+                    />
+                  </View>
+                  <TouchableOpacity 
+                    style={[styles.mapButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f3f4f6' }]} 
+                    onPress={() => openMap('start')}
+                  >
+                    <Map size={20} color={theme.primary} />
+                  </TouchableOpacity>
+                </View>
               </Animated.View>
 
               <Animated.View entering={FadeInDown.delay(500).duration(800).springify()}>
-                <Input
-                  label="Destination"
-                  leftIcon={<MapPin size={20} color="#ef4444" />}
-                  value={formData.endLocation}
-                  onChangeText={(text) => setFormData({ ...formData, endLocation: text })}
-                  placeholder="e.g. San Jose"
-                />
+                <View style={styles.inputWithButton}>
+                  <View style={{ flex: 1 }}>
+                    <Input
+                      label="Destination"
+                      leftIcon={<MapPin size={20} color="#ef4444" />}
+                      value={formData.endLocation}
+                      onChangeText={(text) => setFormData({ ...formData, endLocation: text })}
+                      placeholder="e.g. San Jose"
+                    />
+                  </View>
+                  <TouchableOpacity 
+                    style={[styles.mapButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f3f4f6' }]} 
+                    onPress={() => openMap('end')}
+                  >
+                    <Map size={20} color="#ef4444" />
+                  </TouchableOpacity>
+                </View>
               </Animated.View>
 
               <Animated.View 
@@ -207,15 +310,169 @@ export default function OfferRide() {
                 </View>
               </Animated.View>
 
-              {showTimePicker && (
-                <DateTimePicker
-                  value={date}
-                  mode="time"
-                  is24Hour={false}
-                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                  onChange={onTimeChange}
-                />
-              )}
+              {/* Custom Time Picker Modal */}
+              <Modal
+                visible={showTimePicker}
+                transparent={true}
+                animationType="slide"
+                onRequestClose={() => setShowTimePicker(false)}
+              >
+                <TouchableOpacity
+                  style={styles.modalOverlay}
+                  activeOpacity={1}
+                  onPress={() => setShowTimePicker(false)}
+                >
+                  <View style={[styles.modalContent, { backgroundColor: theme.surface }]}>
+                    <TouchableOpacity activeOpacity={1} style={{ width: '100%' }}>
+                      <View style={styles.modalHeader}>
+                        <Text style={[styles.modalTitle, { color: theme.text }]}>Select Time</Text>
+                        <TouchableOpacity onPress={() => setShowTimePicker(false)} style={{ padding: 8, marginRight: -8 }}>
+                          <X size={24} color={theme.text} />
+                        </TouchableOpacity>
+                      </View>
+                      
+                      <View style={{ alignItems: 'center', marginBottom: 32 }}>
+                        {/* Digital Time Display (Toggle between Hours/Minutes) */}
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 32, gap: 12 }}>
+                          <TouchableOpacity 
+                            onPress={() => setTimePickerMode('hours')}
+                            style={[
+                              styles.digitalTimeBlock, 
+                              timePickerMode === 'hours' && { backgroundColor: theme.primary, borderColor: theme.primary }
+                            ]}
+                          >
+                            <Text style={[styles.digitalTimeText, { color: timePickerMode === 'hours' ? '#151515' : theme.text }]}>
+                              {((date.getHours() % 12) || 12).toString().padStart(2, '0')}
+                            </Text>
+                          </TouchableOpacity>
+                          <Text style={{ fontSize: 32, fontWeight: '900', color: theme.text }}>:</Text>
+                          <TouchableOpacity 
+                            onPress={() => setTimePickerMode('minutes')}
+                            style={[
+                              styles.digitalTimeBlock, 
+                              timePickerMode === 'minutes' && { backgroundColor: theme.primary, borderColor: theme.primary }
+                            ]}
+                          >
+                            <Text style={[styles.digitalTimeText, { color: timePickerMode === 'minutes' ? '#151515' : theme.text }]}>
+                              {date.getMinutes().toString().padStart(2, '0')}
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+
+                        {/* Analog Clock Face */}
+                        <View style={[styles.clockFace, { backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#f9fafb', borderColor: theme.border, width: CLOCK_RADIUS * 2, height: CLOCK_RADIUS * 2, borderRadius: CLOCK_RADIUS }]}>
+                          {/* Center Dot */}
+                          <View style={[styles.clockCenterPoint, { backgroundColor: theme.primary }]} />
+
+                          {/* Clock Numbers */}
+                          {Array.from({ length: 12 }, (_, i) => {
+                            let value;
+                            if (timePickerMode === 'hours') {
+                              value = i === 0 ? 12 : i;
+                            } else {
+                              value = i * 5;
+                            }
+                            
+                            // Calculate position based on angle
+                            // 0 index is 12 o'clock (top), so angle starts at -90deg (or -PI/2)
+                            const angle = (i * 30 - 90) * (Math.PI / 180);
+                            const x = NUMBER_RADIUS * Math.cos(angle);
+                            const y = NUMBER_RADIUS * Math.sin(angle);
+
+                            const isSelected = timePickerMode === 'hours' 
+                              ? (date.getHours() % 12 || 12) === value
+                              : date.getMinutes() === value;
+
+                            // For minutes, only exact 5-min increments have explicit numbers in the circle renderer, but allow clicking near them. Let's make it simple: 
+                            return (
+                              <TouchableOpacity
+                                key={`clock-${value}`}
+                                style={[
+                                  styles.clockNumberContainer, 
+                                  {
+                                    left: CLOCK_RADIUS + x - 20, // 20 is half the width of the container
+                                    top: CLOCK_RADIUS + y - 20,
+                                  },
+                                  isSelected && { backgroundColor: theme.primary }
+                                ]}
+                                onPress={() => {
+                                  const newDate = new Date(date);
+                                  if (timePickerMode === 'hours') {
+                                    const isPM = newDate.getHours() >= 12;
+                                    let newH = value;
+                                    if (isPM && value !== 12) newH += 12;
+                                    if (!isPM && value === 12) newH = 0;
+                                    newDate.setHours(newH);
+                                    setDate(newDate);
+                                    setDateSelected(true);
+                                    // Auto-advance to minutes
+                                    setTimeout(() => setTimePickerMode('minutes'), 300);
+                                  } else {
+                                    newDate.setMinutes(value);
+                                    setDate(newDate);
+                                    setDateSelected(true);
+                                  }
+                                }}
+                              >
+                                <Text style={[
+                                  styles.clockNumberText,
+                                  { color: isSelected ? '#151515' : theme.text }
+                                ]}>
+                                  {timePickerMode === 'minutes' ? value.toString().padStart(2, '0') : value}
+                                </Text>
+                              </TouchableOpacity>
+                            );
+                          })}
+                          
+                          {/* Clock Hand */}
+                          <View style={[
+                            styles.clockHand,
+                            { 
+                              backgroundColor: theme.primary,
+                              height: NUMBER_RADIUS - 10,
+                              marginTop: -(NUMBER_RADIUS - 10) / 2,
+                              transform: [
+                                { rotate: `${timePickerMode === 'hours' ? ((date.getHours() % 12 || 12) * 30) : (date.getMinutes() * 6)}deg` },
+                                { translateY: -(NUMBER_RADIUS - 10) / 2 }
+                              ]
+                            }
+                          ]} />
+                        </View>
+                      </View>
+
+                      <View style={styles.ampmContainer}>
+                        {['AM', 'PM'].map(period => {
+                          const isPM = date.getHours() >= 12;
+                          const isSelected = (period === 'PM' && isPM) || (period === 'AM' && !isPM);
+                          return (
+                            <TouchableOpacity 
+                              key={period} 
+                              style={[styles.ampmBlock, { borderColor: theme.border }, isSelected && { backgroundColor: theme.primary, borderColor: theme.primary }]} 
+                              onPress={() => {
+                                const newDate = new Date(date);
+                                const h = newDate.getHours();
+                                if (period === 'PM' && h < 12) newDate.setHours(h + 12);
+                                if (period === 'AM' && h >= 12) newDate.setHours(h - 12);
+                                setDate(newDate);
+                                setDateSelected(true);
+                              }}
+                            >
+                              <Text style={[styles.ampmText, { color: isSelected ? '#151515' : theme.text }]}>{period}</Text>
+                            </TouchableOpacity>
+                          );
+                        })}
+                      </View>
+                      
+                      <Button
+                        label="Confirm Time"
+                        variant="black"
+                        size="lg"
+                        onPress={() => setShowTimePicker(false)}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </TouchableOpacity>
+              </Modal>
 
               <Animated.View 
                 entering={FadeInDown.delay(700).duration(800).springify()}
@@ -260,7 +517,7 @@ export default function OfferRide() {
                   icon={<Plus size={24} color={isDark ? theme.primary : '#fff'} />}
                   onPress={handleSubmit}
                   isLoading={isSubmitting}
-                  style={{ marginTop: 12 }}
+                  style={{ marginTop: 24 }}
                 />
               </Animated.View>
             </View>
@@ -284,7 +541,7 @@ export default function OfferRide() {
             <TouchableOpacity activeOpacity={1} style={{ width: '100%' }}>
               <View style={styles.modalHeader}>
                 <Text style={[styles.modalTitle, { color: theme.text }]}>Select Date</Text>
-                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                <TouchableOpacity onPress={() => setShowDatePicker(false)} style={{ padding: 8, marginRight: -8 }}>
                   <X size={24} color={theme.text} />
                 </TouchableOpacity>
               </View>
@@ -314,9 +571,10 @@ export default function OfferRide() {
                           setDate(newDate);
                           setDateSelected(true);
                           setShowDatePicker(false);
-                          if (Platform.OS === 'android') {
-                            setTimeout(() => setShowTimePicker(true), 300);
-                          }
+                          setTimeout(() => {
+                            setShowTimePicker(true);
+                            setTimePickerMode('hours');
+                          }, 300);
                         }}
                       >
                         <Text style={[
@@ -351,7 +609,47 @@ export default function OfferRide() {
           </View>
         </TouchableOpacity>
       </Modal>
-    </View>
+
+      {/* Map Selector Modal */}
+      <Modal
+        visible={mapModalVisible}
+        transparent={false}
+        animationType="slide"
+        onRequestClose={() => setMapModalVisible(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: theme.background }}>
+          <MapView
+            style={StyleSheet.absoluteFillObject}
+            region={mapRegion}
+            provider={PROVIDER_GOOGLE}
+            onRegionChangeComplete={(region) => setMapRegion(region)}
+          >
+            <Marker coordinate={{ latitude: mapRegion.latitude, longitude: mapRegion.longitude }} pinColor={theme.primary} />
+          </MapView>
+          
+          <View style={styles.mapOverlayTop}>
+            <TouchableOpacity 
+              style={[styles.closeMapButton, { backgroundColor: theme.surface }]} 
+              onPress={() => setMapModalVisible(false)}
+            >
+              <X size={24} color={theme.text} />
+            </TouchableOpacity>
+            <View style={[styles.mapBadge, { backgroundColor: theme.primary }]}>
+              <Text style={styles.mapBadgeText}>Set {pickingMode === 'start' ? 'Departure' : 'Destination'}</Text>
+            </View>
+          </View>
+
+          <View style={styles.mapOverlayBottom}>
+            <Button
+              label={`Confirm ${pickingMode === 'start' ? 'Departure' : 'Destination'}`}
+              variant="black"
+              size="lg"
+              onPress={handleMapConfirm}
+            />
+          </View>
+        </View>
+      </Modal>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -402,6 +700,61 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
+  },
+  inputWithButton: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 12,
+  },
+  mapButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  mapOverlayTop: {
+    position: 'absolute',
+    top: 60,
+    left: 24,
+    right: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  closeMapButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  mapBadge: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 25,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  mapBadgeText: {
+    fontSize: 14,
+    fontWeight: '900',
+    color: '#151515',
+  },
+  mapOverlayBottom: {
+    position: 'absolute',
+    bottom: 40,
+    left: 24,
+    right: 24,
   },
   successTitle: {
     fontSize: 28,
@@ -469,5 +822,70 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     position: 'absolute',
     bottom: 12,
+  },
+  digitalTimeBlock: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  digitalTimeText: {
+    fontSize: 40,
+    fontWeight: '900',
+    letterSpacing: -1,
+  },
+  clockFace: {
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  clockCenterPoint: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    position: 'absolute',
+    zIndex: 10,
+  },
+  clockNumberContainer: {
+    position: 'absolute',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 5,
+  },
+  clockNumberText: {
+    fontSize: 16,
+    fontWeight: '900',
+  },
+  clockHand: {
+    position: 'absolute',
+    width: 2,
+    borderRadius: 2,
+    zIndex: 1,
+    top: '50%',
+    left: '50%',
+    marginLeft: -1, // half width
+  },
+  ampmContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 32,
+  },
+  ampmBlock: {
+    flex: 1,
+    height: 60,
+    borderRadius: 16,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  ampmText: {
+    fontSize: 18,
+    fontWeight: '900',
+    letterSpacing: 1,
   }
 });

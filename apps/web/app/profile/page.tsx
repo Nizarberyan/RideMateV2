@@ -2,19 +2,22 @@
 
 import { useAuth } from "../../context/AuthContext";
 import { client } from "../../lib/api";
-import { ArrowLeft, Save, User as UserIcon, Car, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowLeft, Save, User as UserIcon, Car, CheckCircle2, AlertCircle, Camera, X, MapPin } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function Profile() {
   const { user, isLoading, login } = useAuth();
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
     name: "",
     bio: "",
+    city: "",
+    photo: "",
     vehicleModel: "",
     vehicleColor: "",
     vehiclePlate: "",
@@ -29,6 +32,8 @@ export default function Profile() {
       setFormData({
         name: user.name || "",
         bio: user.bio || "",
+        city: user.city || "",
+        photo: user.photo || "",
         vehicleModel: user.vehicleModel || "",
         vehicleColor: user.vehicleColor || "",
         vehiclePlate: user.vehiclePlate || "",
@@ -41,6 +46,22 @@ export default function Profile() {
     router.push("/login");
     return null;
   }
+
+  const handleImagePick = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, photo: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setFormData({ ...formData, photo: "" });
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,9 +104,39 @@ export default function Profile() {
       </nav>
 
       <main className="max-w-2xl mx-auto px-6 pt-12">
-        <header className="mb-10 flex items-center gap-6">
-          <div className="w-24 h-24 bg-lime-brand rounded-[32px] flex items-center justify-center shadow-lg shadow-lime-brand/20">
-            <UserIcon size={40} className="text-black-brand" />
+        <header className="mb-10 flex flex-col items-center text-center gap-6">
+          <div className="relative group">
+            <div 
+              className="w-32 h-32 bg-lime-brand rounded-[40px] flex items-center justify-center shadow-xl shadow-lime-brand/20 overflow-hidden cursor-pointer relative"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {formData.photo ? (
+                <img src={formData.photo} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <UserIcon size={48} className="text-black-brand" />
+              )}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <Camera size={32} className="text-white" />
+              </div>
+            </div>
+            
+            {formData.photo && (
+              <button 
+                type="button"
+                onClick={removeImage}
+                className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors z-10"
+              >
+                <X size={16} />
+              </button>
+            )}
+            
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              className="hidden" 
+              accept="image/*"
+              onChange={handleImagePick}
+            />
           </div>
           <div>
             <h1 className="text-4xl font-bold text-black-brand tracking-tight">{user.name || "User"}</h1>
@@ -111,6 +162,23 @@ export default function Profile() {
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
                 />
               </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-black uppercase tracking-widest text-gray-brand ml-1">Home City</label>
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-lime-brand">
+                    <MapPin size={18} />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="e.g. San Francisco"
+                    className="w-full pl-12 pr-5 py-4 bg-background border border-black/5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-lime-brand/30 transition-all font-medium"
+                    value={formData.city}
+                    onChange={(e) => setFormData({...formData, city: e.target.value})}
+                  />
+                </div>
+              </div>
+
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-black uppercase tracking-widest text-gray-brand ml-1">Bio</label>
                 <textarea

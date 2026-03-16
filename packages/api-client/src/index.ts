@@ -6,6 +6,9 @@ export type User = {
   photo?: string | null;
   bio?: string | null;
   city?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  radius: number;
   carbonSavedKg: number;
   vehicleModel?: string | null;
   vehicleColor?: string | null;
@@ -18,7 +21,11 @@ export type Ride = {
   driverId: string;
   driver?: User;
   startLocation: string;
+  startLat?: number | null;
+  startLng?: number | null;
   endLocation: string;
+  endLat?: number | null;
+  endLng?: number | null;
   departureDatetime: string;
   availableSeats: number;
   status: string;
@@ -41,7 +48,11 @@ export type Booking = {
 
 export interface CreateRideInput {
   startLocation: string;
+  startLat?: number;
+  startLng?: number;
   endLocation: string;
+  endLat?: number;
+  endLng?: number;
   departureDatetime: string;
   availableSeats: number;
   description?: string;
@@ -53,6 +64,9 @@ export interface UpdateUserInput {
   bio?: string;
   photo?: string;
   city?: string;
+  latitude?: number;
+  longitude?: number;
+  radius?: number;
   vehicleModel?: string;
   vehicleColor?: string;
   vehiclePlate?: string;
@@ -79,6 +93,9 @@ export interface RideFilters {
   to?: string;
   date?: string;
   city?: string;
+  lat?: number;
+  lng?: number;
+  radius?: number;
 }
 
 export const createClient = (options: ClientOptions) => {
@@ -127,6 +144,9 @@ export const createClient = (options: ClientOptions) => {
         body: JSON.stringify(data),
       }),
     },
+    users: {
+      getOne: (id: string): Promise<User> => fetchApi(`/users/${id}`),
+    },
     rides: {
       getMine: (): Promise<Ride[]> => fetchApi("/rides/mine"),
       getAll: (filters?: RideFilters): Promise<Ride[]> => {
@@ -135,6 +155,9 @@ export const createClient = (options: ClientOptions) => {
         if (filters?.to) params.append("to", filters.to);
         if (filters?.date) params.append("date", filters.date);
         if (filters?.city) params.append("city", filters.city);
+        if (filters?.lat) params.append("lat", filters.lat.toString());
+        if (filters?.lng) params.append("lng", filters.lng.toString());
+        if (filters?.radius) params.append("radius", filters.radius.toString());
         
         const queryString = params.toString();
         return fetchApi(`/rides${queryString ? `?${queryString}` : ""}`);

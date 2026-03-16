@@ -66,12 +66,12 @@ export function RideActivityCard({ type, ride, booking, onCancel }: RideActivity
           <div className="flex flex-wrap gap-2">
             {ride!.bookings.length > 0 ? (
               ride!.bookings.map((b) => (
-                <div key={b.id} className="flex items-center gap-2 bg-background pl-1 pr-3 py-1 rounded-full border border-black/5">
+                <Link key={b.id} href={`/user/${b.userId}`} className="flex items-center gap-2 bg-background pl-1 pr-3 py-1 rounded-full border border-black/5 hover:border-lime-brand/50 transition-all">
                   <div className="w-6 h-6 bg-lime-brand rounded-full flex items-center justify-center text-[10px] font-black">
                     {b.user?.name?.[0] || 'U'}
                   </div>
                   <span className="text-[10px] font-bold text-black-brand">{b.user?.name}</span>
-                </div>
+                </Link>
               ))
             ) : (
               <div className="text-xs text-gray-brand/50 font-medium italic py-2">No bookings yet</div>
@@ -79,27 +79,27 @@ export function RideActivityCard({ type, ride, booking, onCancel }: RideActivity
           </div>
         </div>
       ) : (
-        <div className="flex items-center gap-4 p-4 bg-background rounded-3xl border border-black/5">
+        <Link href={`/user/${data.driverId}`} className="flex items-center gap-4 p-4 bg-background rounded-3xl border border-black/5 hover:border-lime-brand/50 transition-all">
           <div className="w-12 h-12 bg-lime-brand rounded-2xl flex items-center justify-center font-black text-black-brand">
             {data.driver?.name?.[0] || 'D'}
           </div>
           <div>
-            <div className="text-[10px] font-black text-gray-brand uppercase tracking-widest mb-0.5">Your Driver</div>
-            <div className="text-sm font-black text-black-brand">{data.driver?.name || 'RideMate Driver'}</div>
+            <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Your Driver</div>
+            <div className="text-sm font-black text-black-brand group-hover:text-lime-brand transition-colors">{data.driver?.name || 'RideMate Driver'}</div>
           </div>
           <div className="ml-auto flex flex-col items-end">
-            <div className="text-[10px] font-black text-gray-brand uppercase tracking-widest mb-0.5">Seats</div>
+            <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Seats</div>
             <div className="text-sm font-black text-black-brand">{booking!.seatsBooked}</div>
           </div>
-        </div>
+        </Link>
       )}
 
       <div className="mt-8 pt-6 border-t border-black/5 flex items-center justify-between">
         {type === "driver" ? (
-          <div className="flex items-center gap-2">
-            <UserCheck size={16} className="text-lime-brand" />
-            <span className="text-xs font-bold text-black-brand">{ride!.bookings.length} Seats Booked</span>
-          </div>
+          <Link href={`/rides/${data.id}`} className="w-full py-3 bg-white border border-black/5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-black-brand hover:bg-black/5 transition-all flex items-center justify-center gap-2">
+            Manage Trip Details
+            <ChevronRight size={14} />
+          </Link>
         ) : (
           <Link href={`/rides/${data.id}`} className="w-full py-3 bg-white border border-black/5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-black-brand hover:bg-black/5 transition-all flex items-center justify-center gap-2">
             View Trip Details
