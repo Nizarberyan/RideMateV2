@@ -3,18 +3,130 @@ import { CreateRideDto } from "./dto/create-ride.dto";
 import { UpdateRideDto } from "./dto/update-ride.dto";
 import { PrismaService } from "../prisma/prisma.service";
 
+export interface RouteResult {
+  distanceKm: number;
+  encodedPolyline: string;
+}
+
+interface GoogleRoutesResponse {
+  routes?: Array<{
+    distanceMeters?: number;
+    polyline?: {
+      encodedPolyline?: string;
+    };
+  }>;
+}
+
 @Injectable()
 export class RidesService {
   constructor(private prisma: PrismaService) {}
 
+  private async computeRoute(
+    startLat: number,
+    startLng: number,
+    endLat: number,
+    endLng: number,
+  ): Promise<RouteResult | null> {
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    if (!apiKey) {
+      console.warn(
+        "GOOGLE_MAPS_API_KEY is not set — skipping route computation",
+      );
+      return null;
+    }
+
+    try {
+      const response = await fetch(
+        "https://routes.googleapis.com/directions/v2:computeRoutes",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Goog-Api-Key": apiKey,
+            "X-Goog-FieldMask":
+              "routes.distanceMeters,routes.polyline.encodedPolyline",
+          },
+          body: JSON.stringify({
+            origin: {
+              location: { latLng: { latitude: startLat, longitude: startLng } },
+            },
+            destination: {
+              location: { latLng: { latitude: endLat, longitude: endLng } },
+            },
+            travelMode: "DRIVE",
+            routingPreference: "TRAFFIC_AWARE",
+          }),
+        },
+      );
+
+      const data = (await response.json()) as GoogleRoutesResponse;
+      if (data.routes && data.routes.length > 0) {
+        const route = data.routes[0];
+        const distanceKm = (route.distanceMeters || 0) / 1000;
+        const encodedPolyline = route.polyline?.encodedPolyline || "";
+        return { distanceKm, encodedPolyline };
+      }
+
+      console.error("Google Routes API returned no routes:", data);
+    } catch (error) {
+      console.error("Error calling Google Routes API:", error);
+    }
+
+    return null;
+  }
+
   async create(driverId: string, createRideDto: CreateRideDto) {
-    return this.prisma.ride.create({
+    const ride = await this.prisma.ride.create({
       data: {
         ...createRideDto,
         departureDatetime: new Date(createRideDto.departureDatetime),
         driverId,
       },
     });
+
+    // Auto-compute distance if coordinates were provided
+    if (
+      createRideDto.startLat &&
+      createRideDto.startLng &&
+      createRideDto.endLat &&
+      createRideDto.endLng
+    ) {
+      const routeResult = await this.computeRoute(
+        createRideDto.startLat,
+        createRideDto.startLng,
+        createRideDto.endLat,
+        createRideDto.endLng,
+      );
+
+      if (routeResult) {
+        return this.prisma.ride.update({
+          where: { id: ride.id },
+          data: { distanceKm: routeResult.distanceKm },
+        });
+      }
+    }
+
+    return ride;
+  }
+
+  async getRoute(id: string): Promise<RouteResult | null> {
+    const ride = await this.prisma.ride.findUnique({
+      where: { id },
+      select: { startLat: true, startLng: true, endLat: true, endLng: true },
+    });
+
+    if (!ride) throw new NotFoundException("Ride not found");
+
+    if (!ride.startLat || !ride.startLng || !ride.endLat || !ride.endLng) {
+      return null;
+    }
+
+    return this.computeRoute(
+      ride.startLat,
+      ride.startLng,
+      ride.endLat,
+      ride.endLng,
+    );
   }
 
   async findAllByUser(driverId: string) {
@@ -32,7 +144,15 @@ export class RidesService {
     });
   }
 
-  async findAll(filters?: { from?: string; to?: string; date?: string; city?: string; lat?: number; lng?: number; radius?: number }) {
+  async findAll(filters?: {
+    from?: string;
+    to?: string;
+    date?: string;
+    city?: string;
+    lat?: number;
+    lng?: number;
+    radius?: number;
+  }) {
     if (filters?.lat && filters?.lng && filters?.radius) {
       // Radius search using Haversine formula directly in SQL since PostGIS was not available in migration
       const radius = filters.radius; // in km
@@ -56,35 +176,35 @@ export class RidesService {
     }
 
     const where: any = {
-      status: 'ACTIVE',
+      status: "ACTIVE",
     };
 
     if (filters?.from) {
-      where.startLocation = { contains: filters.from, mode: 'insensitive' };
+      where.startLocation = { contains: filters.from, mode: "insensitive" };
     }
     if (filters?.to) {
-      where.endLocation = { contains: filters.to, mode: 'insensitive' };
+      where.endLocation = { contains: filters.to, mode: "insensitive" };
     }
     if (filters?.date) {
       const searchDate = new Date(filters.date);
       const nextDay = new Date(searchDate);
       nextDay.setDate(nextDay.getDate() + 1);
-      
+
       where.departureDatetime = {
         gte: searchDate,
         lt: nextDay,
       };
     }
-    
+
     // If no filters, and a city is provided, prioritize rides from that city
     if (!filters?.from && !filters?.to && !filters?.date && filters?.city) {
-      where.startLocation = { contains: filters.city, mode: 'insensitive' };
+      where.startLocation = { contains: filters.city, mode: "insensitive" };
     }
 
     return this.prisma.ride.findMany({
       where,
       take: 20,
-      orderBy: { departureDatetime: 'asc' },
+      orderBy: { departureDatetime: "asc" },
       include: {
         driver: {
           select: {

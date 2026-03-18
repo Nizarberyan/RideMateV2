@@ -15,19 +15,26 @@ import { CreateRideDto } from "./dto/create-ride.dto";
 import { UpdateRideDto } from "./dto/update-ride.dto";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 
+interface AuthenticatedRequest extends Request {
+  user: { id: string };
+}
+
 @Controller("rides")
 export class RidesController {
   constructor(private readonly ridesService: RidesService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Request() req: any, @Body() createRideDto: CreateRideDto) {
+  create(
+    @Request() req: AuthenticatedRequest,
+    @Body() createRideDto: CreateRideDto,
+  ) {
     return this.ridesService.create(req.user.id, createRideDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get("mine")
-  findAllByUser(@Request() req: any) {
+  findAllByUser(@Request() req: AuthenticatedRequest) {
     return this.ridesService.findAllByUser(req.user.id);
   }
 
@@ -41,15 +48,20 @@ export class RidesController {
     @Query("lng") lng?: string,
     @Query("radius") radius?: string,
   ) {
-    return this.ridesService.findAll({ 
-      from, 
-      to, 
-      date, 
-      city, 
-      lat: lat ? parseFloat(lat) : undefined, 
-      lng: lng ? parseFloat(lng) : undefined, 
-      radius: radius ? parseFloat(radius) : undefined 
+    return this.ridesService.findAll({
+      from,
+      to,
+      date,
+      city,
+      lat: lat ? parseFloat(lat) : undefined,
+      lng: lng ? parseFloat(lng) : undefined,
+      radius: radius ? parseFloat(radius) : undefined,
     });
+  }
+
+  @Get(":id/route")
+  getRoute(@Param("id") id: string) {
+    return this.ridesService.getRoute(id);
   }
 
   @Get(":id")
@@ -60,7 +72,7 @@ export class RidesController {
   @UseGuards(JwtAuthGuard)
   @Patch(":id")
   update(
-    @Request() req: any,
+    @Request() req: AuthenticatedRequest,
     @Param("id") id: string,
     @Body() updateRideDto: UpdateRideDto,
   ) {
@@ -69,7 +81,7 @@ export class RidesController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(":id")
-  remove(@Request() req: any, @Param("id") id: string) {
+  remove(@Request() req: AuthenticatedRequest, @Param("id") id: string) {
     return this.ridesService.remove(id, req.user.id);
   }
 }

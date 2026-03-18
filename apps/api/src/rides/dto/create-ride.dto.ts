@@ -44,8 +44,4 @@ export class CreateRideDto {
   @IsOptional()
   @IsString()
   description?: string;
-
-  @IsOptional()
-  @IsNumber()
-  distanceKm?: number;
 }
