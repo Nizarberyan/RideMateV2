@@ -28,10 +28,16 @@ export type AggregateUser = {
 
 export type UserAvgAggregateOutputType = {
   carbonSavedKg: number | null
+  latitude: number | null
+  longitude: number | null
+  radius: number | null
 }
 
 export type UserSumAggregateOutputType = {
   carbonSavedKg: number | null
+  latitude: number | null
+  longitude: number | null
+  radius: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -44,6 +50,9 @@ export type UserMinAggregateOutputType = {
   role: $Enums.Role | null
   carbonSavedKg: number | null
   city: string | null
+  latitude: number | null
+  longitude: number | null
+  radius: number | null
   refreshToken: string | null
   vehicleModel: string | null
   vehicleColor: string | null
@@ -62,6 +71,9 @@ export type UserMaxAggregateOutputType = {
   role: $Enums.Role | null
   carbonSavedKg: number | null
   city: string | null
+  latitude: number | null
+  longitude: number | null
+  radius: number | null
   refreshToken: string | null
   vehicleModel: string | null
   vehicleColor: string | null
@@ -80,6 +92,9 @@ export type UserCountAggregateOutputType = {
   role: number
   carbonSavedKg: number
   city: number
+  latitude: number
+  longitude: number
+  radius: number
   refreshToken: number
   vehicleModel: number
   vehicleColor: number
@@ -92,10 +107,16 @@ export type UserCountAggregateOutputType = {
 
 export type UserAvgAggregateInputType = {
   carbonSavedKg?: true
+  latitude?: true
+  longitude?: true
+  radius?: true
 }
 
 export type UserSumAggregateInputType = {
   carbonSavedKg?: true
+  latitude?: true
+  longitude?: true
+  radius?: true
 }
 
 export type UserMinAggregateInputType = {
@@ -108,6 +129,9 @@ export type UserMinAggregateInputType = {
   role?: true
   carbonSavedKg?: true
   city?: true
+  latitude?: true
+  longitude?: true
+  radius?: true
   refreshToken?: true
   vehicleModel?: true
   vehicleColor?: true
@@ -126,6 +150,9 @@ export type UserMaxAggregateInputType = {
   role?: true
   carbonSavedKg?: true
   city?: true
+  latitude?: true
+  longitude?: true
+  radius?: true
   refreshToken?: true
   vehicleModel?: true
   vehicleColor?: true
@@ -144,6 +171,9 @@ export type UserCountAggregateInputType = {
   role?: true
   carbonSavedKg?: true
   city?: true
+  latitude?: true
+  longitude?: true
+  radius?: true
   refreshToken?: true
   vehicleModel?: true
   vehicleColor?: true
@@ -249,6 +279,9 @@ export type UserGroupByOutputType = {
   role: $Enums.Role
   carbonSavedKg: number
   city: string | null
+  latitude: number | null
+  longitude: number | null
+  radius: number
   refreshToken: string | null
   vehicleModel: string | null
   vehicleColor: string | null
@@ -290,6 +323,9 @@ export type UserWhereInput = {
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   carbonSavedKg?: Prisma.FloatFilter<"User"> | number
   city?: Prisma.StringNullableFilter<"User"> | string | null
+  latitude?: Prisma.FloatNullableFilter<"User"> | number | null
+  longitude?: Prisma.FloatNullableFilter<"User"> | number | null
+  radius?: Prisma.FloatFilter<"User"> | number
   refreshToken?: Prisma.StringNullableFilter<"User"> | string | null
   vehicleModel?: Prisma.StringNullableFilter<"User"> | string | null
   vehicleColor?: Prisma.StringNullableFilter<"User"> | string | null
@@ -310,6 +346,9 @@ export type UserOrderByWithRelationInput = {
   role?: Prisma.SortOrder
   carbonSavedKg?: Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
+  latitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  longitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  radius?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrderInput | Prisma.SortOrder
   vehicleModel?: Prisma.SortOrderInput | Prisma.SortOrder
   vehicleColor?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -333,6 +372,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   carbonSavedKg?: Prisma.FloatFilter<"User"> | number
   city?: Prisma.StringNullableFilter<"User"> | string | null
+  latitude?: Prisma.FloatNullableFilter<"User"> | number | null
+  longitude?: Prisma.FloatNullableFilter<"User"> | number | null
+  radius?: Prisma.FloatFilter<"User"> | number
   refreshToken?: Prisma.StringNullableFilter<"User"> | string | null
   vehicleModel?: Prisma.StringNullableFilter<"User"> | string | null
   vehicleColor?: Prisma.StringNullableFilter<"User"> | string | null
@@ -353,6 +395,9 @@ export type UserOrderByWithAggregationInput = {
   role?: Prisma.SortOrder
   carbonSavedKg?: Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
+  latitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  longitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  radius?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrderInput | Prisma.SortOrder
   vehicleModel?: Prisma.SortOrderInput | Prisma.SortOrder
   vehicleColor?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -379,6 +424,9 @@ export type UserScalarWhereWithAggregatesInput = {
   role?: Prisma.EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
   carbonSavedKg?: Prisma.FloatWithAggregatesFilter<"User"> | number
   city?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  latitude?: Prisma.FloatNullableWithAggregatesFilter<"User"> | number | null
+  longitude?: Prisma.FloatNullableWithAggregatesFilter<"User"> | number | null
+  radius?: Prisma.FloatWithAggregatesFilter<"User"> | number
   refreshToken?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   vehicleModel?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   vehicleColor?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
@@ -397,6 +445,9 @@ export type UserCreateInput = {
   role?: $Enums.Role
   carbonSavedKg?: number
   city?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  radius?: number
   refreshToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
@@ -417,6 +468,9 @@ export type UserUncheckedCreateInput = {
   role?: $Enums.Role
   carbonSavedKg?: number
   city?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  radius?: number
   refreshToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
@@ -437,6 +491,9 @@ export type UserUpdateInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   carbonSavedKg?: Prisma.FloatFieldUpdateOperationsInput | number
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  radius?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -457,6 +514,9 @@ export type UserUncheckedUpdateInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   carbonSavedKg?: Prisma.FloatFieldUpdateOperationsInput | number
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  radius?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -477,6 +537,9 @@ export type UserCreateManyInput = {
   role?: $Enums.Role
   carbonSavedKg?: number
   city?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  radius?: number
   refreshToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
@@ -495,6 +558,9 @@ export type UserUpdateManyMutationInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   carbonSavedKg?: Prisma.FloatFieldUpdateOperationsInput | number
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  radius?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -513,6 +579,9 @@ export type UserUncheckedUpdateManyInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   carbonSavedKg?: Prisma.FloatFieldUpdateOperationsInput | number
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  radius?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -531,6 +600,9 @@ export type UserCountOrderByAggregateInput = {
   role?: Prisma.SortOrder
   carbonSavedKg?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
+  radius?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrder
   vehicleModel?: Prisma.SortOrder
   vehicleColor?: Prisma.SortOrder
@@ -541,6 +613,9 @@ export type UserCountOrderByAggregateInput = {
 
 export type UserAvgOrderByAggregateInput = {
   carbonSavedKg?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
+  radius?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -553,6 +628,9 @@ export type UserMaxOrderByAggregateInput = {
   role?: Prisma.SortOrder
   carbonSavedKg?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
+  radius?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrder
   vehicleModel?: Prisma.SortOrder
   vehicleColor?: Prisma.SortOrder
@@ -571,6 +649,9 @@ export type UserMinOrderByAggregateInput = {
   role?: Prisma.SortOrder
   carbonSavedKg?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
+  radius?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrder
   vehicleModel?: Prisma.SortOrder
   vehicleColor?: Prisma.SortOrder
@@ -581,6 +662,9 @@ export type UserMinOrderByAggregateInput = {
 
 export type UserSumOrderByAggregateInput = {
   carbonSavedKg?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
+  radius?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -602,6 +686,14 @@ export type EnumRoleFieldUpdateOperationsInput = {
 
 export type FloatFieldUpdateOperationsInput = {
   set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type NullableFloatFieldUpdateOperationsInput = {
+  set?: number | null
   increment?: number
   decrement?: number
   multiply?: number
@@ -650,6 +742,9 @@ export type UserCreateWithoutRidesAsDriverInput = {
   role?: $Enums.Role
   carbonSavedKg?: number
   city?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  radius?: number
   refreshToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
@@ -669,6 +764,9 @@ export type UserUncheckedCreateWithoutRidesAsDriverInput = {
   role?: $Enums.Role
   carbonSavedKg?: number
   city?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  radius?: number
   refreshToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
@@ -704,6 +802,9 @@ export type UserUpdateWithoutRidesAsDriverInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   carbonSavedKg?: Prisma.FloatFieldUpdateOperationsInput | number
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  radius?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -723,6 +824,9 @@ export type UserUncheckedUpdateWithoutRidesAsDriverInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   carbonSavedKg?: Prisma.FloatFieldUpdateOperationsInput | number
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  radius?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -742,6 +846,9 @@ export type UserCreateWithoutBookingsInput = {
   role?: $Enums.Role
   carbonSavedKg?: number
   city?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  radius?: number
   refreshToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
@@ -761,6 +868,9 @@ export type UserUncheckedCreateWithoutBookingsInput = {
   role?: $Enums.Role
   carbonSavedKg?: number
   city?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  radius?: number
   refreshToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
@@ -796,6 +906,9 @@ export type UserUpdateWithoutBookingsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   carbonSavedKg?: Prisma.FloatFieldUpdateOperationsInput | number
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  radius?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -815,6 +928,9 @@ export type UserUncheckedUpdateWithoutBookingsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   carbonSavedKg?: Prisma.FloatFieldUpdateOperationsInput | number
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  radius?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -874,6 +990,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   role?: boolean
   carbonSavedKg?: boolean
   city?: boolean
+  latitude?: boolean
+  longitude?: boolean
+  radius?: boolean
   refreshToken?: boolean
   vehicleModel?: boolean
   vehicleColor?: boolean
@@ -895,6 +1014,9 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   role?: boolean
   carbonSavedKg?: boolean
   city?: boolean
+  latitude?: boolean
+  longitude?: boolean
+  radius?: boolean
   refreshToken?: boolean
   vehicleModel?: boolean
   vehicleColor?: boolean
@@ -913,6 +1035,9 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   role?: boolean
   carbonSavedKg?: boolean
   city?: boolean
+  latitude?: boolean
+  longitude?: boolean
+  radius?: boolean
   refreshToken?: boolean
   vehicleModel?: boolean
   vehicleColor?: boolean
@@ -931,6 +1056,9 @@ export type UserSelectScalar = {
   role?: boolean
   carbonSavedKg?: boolean
   city?: boolean
+  latitude?: boolean
+  longitude?: boolean
+  radius?: boolean
   refreshToken?: boolean
   vehicleModel?: boolean
   vehicleColor?: boolean
@@ -939,7 +1067,7 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "bio" | "photo" | "role" | "carbonSavedKg" | "city" | "refreshToken" | "vehicleModel" | "vehicleColor" | "vehiclePlate" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "bio" | "photo" | "role" | "carbonSavedKg" | "city" | "latitude" | "longitude" | "radius" | "refreshToken" | "vehicleModel" | "vehicleColor" | "vehiclePlate" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ridesAsDriver?: boolean | Prisma.User$ridesAsDriverArgs<ExtArgs>
   bookings?: boolean | Prisma.User$bookingsArgs<ExtArgs>
@@ -964,6 +1092,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     role: $Enums.Role
     carbonSavedKg: number
     city: string | null
+    latitude: number | null
+    longitude: number | null
+    radius: number
     refreshToken: string | null
     vehicleModel: string | null
     vehicleColor: string | null
@@ -1404,6 +1535,9 @@ export interface UserFieldRefs {
   readonly role: Prisma.FieldRef<"User", 'Role'>
   readonly carbonSavedKg: Prisma.FieldRef<"User", 'Float'>
   readonly city: Prisma.FieldRef<"User", 'String'>
+  readonly latitude: Prisma.FieldRef<"User", 'Float'>
+  readonly longitude: Prisma.FieldRef<"User", 'Float'>
+  readonly radius: Prisma.FieldRef<"User", 'Float'>
   readonly refreshToken: Prisma.FieldRef<"User", 'String'>
   readonly vehicleModel: Prisma.FieldRef<"User", 'String'>
   readonly vehicleColor: Prisma.FieldRef<"User", 'String'>
@@ -1606,6 +1740,11 @@ export type UserFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Skip the first `n` Users.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Users.
+   */
   distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
 }
 

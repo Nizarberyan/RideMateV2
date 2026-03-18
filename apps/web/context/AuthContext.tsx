@@ -6,7 +6,7 @@ import React, {
   useState,
   useEffect,
   ReactNode,
-  useCallback,
+  useCallback,logout
 } from "react";
 import { useRouter } from "next/navigation";
 import { User, AuthResponse } from "@repo/api-client";
