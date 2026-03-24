@@ -38,8 +38,10 @@ export class RidesController {
     return this.ridesService.findAllByUser(req.user.id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll(
+    @Request() req: AuthenticatedRequest,
     @Query("from") from?: string,
     @Query("to") to?: string,
     @Query("date") date?: string,
@@ -56,6 +58,7 @@ export class RidesController {
       lat: lat ? parseFloat(lat) : undefined,
       lng: lng ? parseFloat(lng) : undefined,
       radius: radius ? parseFloat(radius) : undefined,
+      userId: req.user.id,
     });
   }
 
@@ -77,6 +80,12 @@ export class RidesController {
     @Body() updateRideDto: UpdateRideDto,
   ) {
     return this.ridesService.update(id, req.user.id, updateRideDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(":id/cancel")
+  cancelRide(@Request() req: AuthenticatedRequest, @Param("id") id: string) {
+    return this.ridesService.cancelRide(id, req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)

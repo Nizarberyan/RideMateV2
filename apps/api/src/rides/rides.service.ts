@@ -152,6 +152,7 @@ export class RidesService {
     lat?: number;
     lng?: number;
     radius?: number;
+    userId?: string;
   }) {
     if (filters?.lat && filters?.lng && filters?.radius) {
       // Radius search using Haversine formula directly in SQL since PostGIS was not available in migration
@@ -160,24 +161,43 @@ export class RidesService {
       const lng = filters.lng;
 
       // SQL query to find rides within radius
-      // distance = 6371 * acos(cos(radians(lat)) * cos(radians(startLat)) * cos(radians(startLng) - radians(lng)) + sin(radians(lat)) * sin(radians(startLat)))
-      return this.prisma.$queryRaw`
-        SELECT r.*, 
-          u.name as "driverName", u.photo as "driverPhoto", 
-          u."vehicleModel", u."vehicleColor", u."vehiclePlate",
-          (6371 * acos(cos(radians(${lat})) * cos(radians("startLat")) * cos(radians("startLng") - radians(${lng})) + sin(radians(${lat})) * sin(radians("startLat")))) AS "distanceKm"
-        FROM "Ride" r
-        JOIN "User" u ON r."driverId" = u.id
-        WHERE r.status = 'ACTIVE'
-        AND (6371 * acos(cos(radians(${lat})) * cos(radians("startLat")) * cos(radians("startLng") - radians(${lng})) + sin(radians(${lat})) * sin(radians("startLat")))) <= ${radius}
-        ORDER BY "distanceKm" ASC
-        LIMIT 20
-      `;
+      if (filters.userId) {
+        return this.prisma.$queryRaw`
+          SELECT r.*, 
+            u.name as "driverName", u.photo as "driverPhoto", 
+            u."vehicleModel", u."vehicleColor", u."vehiclePlate",
+            (6371 * acos(cos(radians(${lat})) * cos(radians("startLat")) * cos(radians("startLng") - radians(${lng})) + sin(radians(${lat})) * sin(radians("startLat")))) AS "searchDistance"
+          FROM "Ride" r
+          JOIN "User" u ON r."driverId" = u.id
+          WHERE r.status = 'ACTIVE'
+          AND r."driverId" != ${filters.userId}
+          AND (6371 * acos(cos(radians(${lat})) * cos(radians("startLat")) * cos(radians("startLng") - radians(${lng})) + sin(radians(${lat})) * sin(radians("startLat")))) <= ${radius}
+          ORDER BY "searchDistance" ASC
+          LIMIT 20
+        `;
+      } else {
+        return this.prisma.$queryRaw`
+          SELECT r.*, 
+            u.name as "driverName", u.photo as "driverPhoto", 
+            u."vehicleModel", u."vehicleColor", u."vehiclePlate",
+            (6371 * acos(cos(radians(${lat})) * cos(radians("startLat")) * cos(radians("startLng") - radians(${lng})) + sin(radians(${lat})) * sin(radians("startLat")))) AS "searchDistance"
+          FROM "Ride" r
+          JOIN "User" u ON r."driverId" = u.id
+          WHERE r.status = 'ACTIVE'
+          AND (6371 * acos(cos(radians(${lat})) * cos(radians("startLat")) * cos(radians("startLng") - radians(${lng})) + sin(radians(${lat})) * sin(radians("startLat")))) <= ${radius}
+          ORDER BY "searchDistance" ASC
+          LIMIT 20
+        `;
+      }
     }
 
     const where: any = {
       status: "ACTIVE",
     };
+
+    if (filters?.userId) {
+      where.driverId = { not: filters.userId };
+    }
 
     if (filters?.from) {
       where.startLocation = { contains: filters.from, mode: "insensitive" };
@@ -264,10 +284,58 @@ export class RidesService {
       data.departureDatetime = new Date(updateRideDto.departureDatetime);
     }
 
+    const coordsChanged =
+      (updateRideDto.startLat !== undefined &&
+        updateRideDto.startLat !== ride.startLat) ||
+      (updateRideDto.startLng !== undefined &&
+        updateRideDto.startLng !== ride.startLng) ||
+      (updateRideDto.endLat !== undefined &&
+        updateRideDto.endLat !== ride.endLat) ||
+      (updateRideDto.endLng !== undefined &&
+        updateRideDto.endLng !== ride.endLng);
+
+    if (coordsChanged) {
+      const finalStartLat = updateRideDto.startLat ?? ride.startLat;
+      const finalStartLng = updateRideDto.startLng ?? ride.startLng;
+      const finalEndLat = updateRideDto.endLat ?? ride.endLat;
+      const finalEndLng = updateRideDto.endLng ?? ride.endLng;
+
+      if (finalStartLat && finalStartLng && finalEndLat && finalEndLng) {
+        const routeResult = await this.computeRoute(
+          finalStartLat,
+          finalStartLng,
+          finalEndLat,
+          finalEndLng,
+        );
+        if (routeResult) {
+          data.distanceKm = routeResult.distanceKm;
+          data.routePolyline = routeResult.encodedPolyline;
+        }
+      }
+    }
+
     return this.prisma.ride.update({
       where: { id },
       data,
     });
+  }
+
+  async cancelRide(id: string, driverId: string) {
+    const ride = await this.findOne(id);
+    if (ride.driverId !== driverId) {
+      throw new NotFoundException("Not authorized to cancel this ride");
+    }
+
+    return this.prisma.$transaction([
+      this.prisma.booking.updateMany({
+        where: { rideId: id },
+        data: { status: "CANCELLED" },
+      }),
+      this.prisma.ride.update({
+        where: { id },
+        data: { status: "CANCELLED" },
+      }),
+    ]);
   }
 
   async remove(id: string, driverId: string) {

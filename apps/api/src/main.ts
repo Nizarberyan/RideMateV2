@@ -2,9 +2,15 @@ import "dotenv/config";
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ValidationPipe } from "@nestjs/common";
+import * as express from "express";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bodyParser: false });
+
+  // Raise body size limit to 5MB to support base64-encoded profile photos
+  app.use(express.json({ limit: "5mb" }));
+  app.use(express.urlencoded({ limit: "5mb", extended: true }));
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -20,4 +26,4 @@ async function bootstrap() {
   console.log(`Application is running on: ${await app.getUrl()}`);
   console.log(`Database URL: ${process.env.DATABASE_URL}`);
 }
-bootstrap();
+void bootstrap();
