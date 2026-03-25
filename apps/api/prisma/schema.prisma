@@ -1,13 +1,10 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
-  moduleFormat    = "cjs"
+  provider      = "prisma-client"
+  output        = "../src/generated/prisma"
+  moduleFormat  = "cjs"
 }
 
 datasource db {
@@ -27,7 +24,8 @@ model User {
   latitude      Float?
   longitude     Float?
   radius        Float    @default(50)
-  
+  rating        Float    @default(0)    // computed average of all received reviews
+
   // Refresh Token
   refreshToken  String?
 
@@ -39,8 +37,12 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  ridesAsDriver Ride[]    @relation("DriverRides")
-  bookings      Booking[]
+  ridesAsDriver     Ride[]      @relation("DriverRides")
+  bookings          Booking[]
+  reviewsGiven      Review[]    @relation("ReviewsGiven")
+  reviewsReceived   Review[]    @relation("ReviewsReceived")
+  complaintsReported Complaint[] @relation("ComplaintsReported")
+  complaintsReceived Complaint[] @relation("ComplaintsReceived")
 }
 
 enum Role {
@@ -63,6 +65,10 @@ model Ride {
   status            RideStatus @default(ACTIVE)
   description       String?
   distanceKm        Float?
+
+  // Booking restriction policy (set by driver)
+  requirePhoto      Boolean    @default(false)
+  minRating         Float?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -91,8 +97,10 @@ model Booking {
   dropoffLocation String?
   isRated         Boolean       @default(false)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  reviews    Review[]
+  complaints Complaint[]
 }
 
 enum BookingStatus {
@@ -100,4 +108,54 @@ enum BookingStatus {
   CONFIRMED
   CANCELLED
   COMPLETED
+}
+
+// --- Reviews ---
+
+model Review {
+  id         String     @id @default(uuid())
+  reviewerId String
+  reviewer   User       @relation("ReviewsGiven", fields: [reviewerId], references: [id])
+  targetId   String
+  target     User       @relation("ReviewsReceived", fields: [targetId], references: [id])
+  bookingId  String
+  booking    Booking    @relation(fields: [bookingId], references: [id])
+  rating     Int        // 1 – 5
+  comment    String?
+  role       ReviewRole // perspective: reviewing the DRIVER or the PASSENGER
+
+  createdAt DateTime @default(now())
+
+  // One review per reviewer per booking (uniqueness enforced at application level)
+  @@unique([reviewerId, bookingId])
+}
+
+enum ReviewRole {
+  DRIVER
+  PASSENGER
+}
+
+// --- Complaints ---
+
+model Complaint {
+  id         String          @id @default(uuid())
+  reporterId String
+  reporter   User            @relation("ComplaintsReported", fields: [reporterId], references: [id])
+  targetId   String
+  target     User            @relation("ComplaintsReceived", fields: [targetId], references: [id])
+  bookingId  String
+  booking    Booking         @relation(fields: [bookingId], references: [id])
+  reason     String
+  status     ComplaintStatus @default(PENDING)
+  adminNote  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ComplaintStatus {
+  PENDING
+  REVIEWED
+  RESOLVED
+  DISMISSED
 }

@@ -43,6 +43,16 @@ export class BookingsController {
     return this.bookingsService.update(id, req.user.id, updateBookingDto);
   }
 
+  @Post(":id/confirm")
+  confirm(@Request() req: any, @Param("id") id: string) {
+    return this.bookingsService.confirm(id, req.user.id);
+  }
+
+  @Post(":id/reject")
+  reject(@Request() req: any, @Param("id") id: string) {
+    return this.bookingsService.reject(id, req.user.id);
+  }
+
   @Delete(":id")
   remove(@Request() req: any, @Param("id") id: string) {
     return this.bookingsService.remove(id, req.user.id);

@@ -7,21 +7,24 @@ import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
 import { RidesModule } from "./rides/rides.module";
 import { BookingsModule } from "./bookings/bookings.module";
+import { ReviewsModule } from "./reviews/reviews.module";
+import { ComplaintsModule } from "./complaints/complaints.module";
 
 @Module({
   imports: [
     LoggerModule.forRoot({
       pinoHttp: {
-        transport:
-          process.env.NODE_ENV !== "production"
-            ? {
+        ...(process.env.NODE_ENV !== "production"
+          ? {
+              transport: {
                 target: "pino-pretty",
                 options: {
                   singleLine: true,
                   colorize: true,
                 },
-              }
-            : undefined,
+              },
+            }
+          : {}),
       },
     }),
     PrismaModule,
@@ -29,6 +32,8 @@ import { BookingsModule } from "./bookings/bookings.module";
     UsersModule,
     RidesModule,
     BookingsModule,
+    ReviewsModule,
+    ComplaintsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
