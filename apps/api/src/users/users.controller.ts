@@ -30,7 +30,7 @@ export class UsersController {
   async findOne(@Param("id") id: string) {
     const user = await this.usersService.findById(id);
     if (!user) return null;
-    
+
     // Omit sensitive data
     const { password, refreshToken, ...publicUser } = user as any;
     return publicUser;

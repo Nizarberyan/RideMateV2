@@ -53,7 +53,10 @@ export class BookingsService {
   async update(id: string, userId: string, updateBookingDto: UpdateBookingDto) {
     const booking = await this.findOne(id);
     // User can update their own booking or driver can update the status
-    if (booking.userId !== userId && (booking.ride as any).driverId !== userId) {
+    if (
+      booking.userId !== userId &&
+      (booking.ride as any).driverId !== userId
+    ) {
       throw new NotFoundException("Not authorized");
     }
 

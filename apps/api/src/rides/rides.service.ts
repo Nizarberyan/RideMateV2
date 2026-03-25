@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, Logger } from "@nestjs/common";
 import { CreateRideDto } from "./dto/create-ride.dto";
 import { UpdateRideDto } from "./dto/update-ride.dto";
 import { PrismaService } from "../prisma/prisma.service";
@@ -19,6 +19,8 @@ interface GoogleRoutesResponse {
 
 @Injectable()
 export class RidesService {
+  private readonly logger = new Logger(RidesService.name);
+
   constructor(private prisma: PrismaService) {}
 
   private async computeRoute(
@@ -29,7 +31,7 @@ export class RidesService {
   ): Promise<RouteResult | null> {
     const apiKey = process.env.GOOGLE_MAPS_API_KEY;
     if (!apiKey) {
-      console.warn(
+      this.logger.warn(
         "GOOGLE_MAPS_API_KEY is not set — skipping route computation",
       );
       return null;
@@ -64,12 +66,15 @@ export class RidesService {
         const route = data.routes[0];
         const distanceKm = (route.distanceMeters || 0) / 1000;
         const encodedPolyline = route.polyline?.encodedPolyline || "";
+        this.logger.log(
+          `Successfully computed route. Distance: ${distanceKm.toFixed(1)}km`,
+        );
         return { distanceKm, encodedPolyline };
       }
 
-      console.error("Google Routes API returned no routes:", data);
+      this.logger.error("Google Routes API returned no routes:", data);
     } catch (error) {
-      console.error("Error calling Google Routes API:", error);
+      this.logger.error("Error calling Google Routes API:", error);
     }
 
     return null;
@@ -91,6 +96,7 @@ export class RidesService {
       createRideDto.endLat &&
       createRideDto.endLng
     ) {
+      this.logger.log(`Computing route for new ride ${ride.id}`);
       const routeResult = await this.computeRoute(
         createRideDto.startLat,
         createRideDto.startLng,
@@ -99,6 +105,7 @@ export class RidesService {
       );
 
       if (routeResult) {
+        this.logger.log(`Route computed and saved for ride ${ride.id}`);
         return this.prisma.ride.update({
           where: { id: ride.id },
           data: { distanceKm: routeResult.distanceKm },

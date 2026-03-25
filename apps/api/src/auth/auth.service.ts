@@ -54,10 +54,10 @@ export class AuthService {
 
     const tokens = await this.getTokens(user.id, user.email, user.role);
     await this.updateRefreshToken(user.id, tokens.refresh_token);
-    
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, refreshToken, ...userResult } = user as any;
-    
+
     return {
       ...tokens,
       user: userResult,
@@ -76,7 +76,7 @@ export class AuthService {
 
     const tokens = await this.getTokens(user.id, user.email, user.role);
     await this.updateRefreshToken(user.id, tokens.refresh_token);
-    
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, refreshToken, ...userResult } = user as any;
 
