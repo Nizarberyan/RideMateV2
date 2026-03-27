@@ -727,10 +727,6 @@ export type EnumRideStatusFieldUpdateOperationsInput = {
   set?: $Enums.RideStatus
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type RideCreateNestedOneWithoutBookingsInput = {
   create?: Prisma.XOR<Prisma.RideCreateWithoutBookingsInput, Prisma.RideUncheckedCreateWithoutBookingsInput>
   connectOrCreate?: Prisma.RideCreateOrConnectWithoutBookingsInput
@@ -1799,6 +1795,11 @@ export type RideFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Skip the first `n` Rides.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Rides.
+   */
   distinct?: Prisma.RideScalarFieldEnum | Prisma.RideScalarFieldEnum[]
 }
 

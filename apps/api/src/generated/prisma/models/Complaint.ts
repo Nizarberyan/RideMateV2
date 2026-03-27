@@ -1554,6 +1554,11 @@ export type ComplaintFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Skip the first `n` Complaints.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Complaints.
+   */
   distinct?: Prisma.ComplaintScalarFieldEnum | Prisma.ComplaintScalarFieldEnum[]
 }
 

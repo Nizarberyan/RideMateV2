@@ -1,7 +1,14 @@
-import { Injectable, NotFoundException, Logger } from "@nestjs/common";
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from "@nestjs/common";
 import { CreateRideDto } from "./dto/create-ride.dto";
 import { UpdateRideDto } from "./dto/update-ride.dto";
 import { PrismaService } from "../prisma/prisma.service";
+import { Prisma } from "@api/generated/prisma/client";
+import { NotificationsService } from "../notifications/notifications.service";
 
 export interface RouteResult {
   distanceKm: number;
@@ -21,7 +28,10 @@ interface GoogleRoutesResponse {
 export class RidesService {
   private readonly logger = new Logger(RidesService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notifications: NotificationsService,
+  ) {}
 
   private async computeRoute(
     startLat: number,
@@ -161,45 +171,45 @@ export class RidesService {
     radius?: number;
     userId?: string;
   }) {
+    const now = new Date();
     if (filters?.lat && filters?.lng && filters?.radius) {
       // Radius search using Haversine formula directly in SQL since PostGIS was not available in migration
       const radius = filters.radius; // in km
       const lat = filters.lat;
       const lng = filters.lng;
 
-      // SQL query to find rides within radius
-      if (filters.userId) {
-        return this.prisma.$queryRaw`
-          SELECT r.*, 
-            u.name as "driverName", u.photo as "driverPhoto", 
-            u."vehicleModel", u."vehicleColor", u."vehiclePlate",
-            (6371 * acos(cos(radians(${lat})) * cos(radians("startLat")) * cos(radians("startLng") - radians(${lng})) + sin(radians(${lat})) * sin(radians("startLat")))) AS "searchDistance"
-          FROM "Ride" r
-          JOIN "User" u ON r."driverId" = u.id
-          WHERE r.status = 'ACTIVE'
-          AND r."driverId" != ${filters.userId}
-          AND (6371 * acos(cos(radians(${lat})) * cos(radians("startLat")) * cos(radians("startLng") - radians(${lng})) + sin(radians(${lat})) * sin(radians("startLat")))) <= ${radius}
-          ORDER BY "searchDistance" ASC
-          LIMIT 20
-        `;
-      } else {
-        return this.prisma.$queryRaw`
-          SELECT r.*, 
-            u.name as "driverName", u.photo as "driverPhoto", 
-            u."vehicleModel", u."vehicleColor", u."vehiclePlate",
-            (6371 * acos(cos(radians(${lat})) * cos(radians("startLat")) * cos(radians("startLng") - radians(${lng})) + sin(radians(${lat})) * sin(radians("startLat")))) AS "searchDistance"
-          FROM "Ride" r
-          JOIN "User" u ON r."driverId" = u.id
-          WHERE r.status = 'ACTIVE'
-          AND (6371 * acos(cos(radians(${lat})) * cos(radians("startLat")) * cos(radians("startLng") - radians(${lng})) + sin(radians(${lat})) * sin(radians("startLat")))) <= ${radius}
-          ORDER BY "searchDistance" ASC
-          LIMIT 20
-        `;
+      let dateFilter = Prisma.empty;
+      if (filters.date) {
+        const searchDate = new Date(filters.date);
+        const nextDay = new Date(searchDate);
+        nextDay.setDate(nextDay.getDate() + 1);
+        dateFilter = Prisma.sql`AND r."departureDatetime" >= ${searchDate} AND r."departureDatetime" < ${nextDay}`;
       }
+
+      const userFilter = filters.userId
+        ? Prisma.sql`AND r."driverId" != ${filters.userId}`
+        : Prisma.empty;
+
+      return this.prisma.$queryRaw`
+        SELECT r.*, 
+          u.name as "driverName", u.photo as "driverPhoto", 
+          u."vehicleModel", u."vehicleColor", u."vehiclePlate",
+          (6371 * acos(cos(radians(${lat})) * cos(radians("startLat")) * cos(radians("startLng") - radians(${lng})) + sin(radians(${lat})) * sin(radians("startLat")))) AS "searchDistance"
+        FROM "Ride" r
+        JOIN "User" u ON r."driverId" = u.id
+        WHERE r.status = 'ACTIVE'
+        AND r."departureDatetime" >= ${now}
+        ${userFilter}
+        ${dateFilter}
+        AND (6371 * acos(cos(radians(${lat})) * cos(radians("startLat")) * cos(radians("startLng") - radians(${lng})) + sin(radians(${lat})) * sin(radians("startLat")))) <= ${radius}
+        ORDER BY "searchDistance" ASC
+        LIMIT 20
+      `;
     }
 
     const where: any = {
       status: "ACTIVE",
+      departureDatetime: { gte: now },
     };
 
     if (filters?.userId) {
@@ -238,6 +248,7 @@ export class RidesService {
             id: true,
             name: true,
             photo: true,
+            rating: true,
             vehicleModel: true,
             vehicleColor: true,
             vehiclePlate: true,
@@ -256,6 +267,7 @@ export class RidesService {
             id: true,
             name: true,
             photo: true,
+            rating: true,
             bio: true,
             carbonSavedKg: true,
             vehicleModel: true,
@@ -333,14 +345,67 @@ export class RidesService {
       throw new NotFoundException("Not authorized to cancel this ride");
     }
 
-    return this.prisma.$transaction([
+    // Find all passengers to notify (those who haven't cancelled themselves)
+    const bookingsToNotify = await this.prisma.booking.findMany({
+      where: { rideId: id, status: { in: ['PENDING', 'CONFIRMED'] } },
+      select: { userId: true },
+    });
+
+    const result = await this.prisma.$transaction([
       this.prisma.booking.updateMany({
-        where: { rideId: id },
+        where: { rideId: id, status: { in: ['PENDING', 'CONFIRMED'] } },
         data: { status: "CANCELLED" },
       }),
       this.prisma.ride.update({
         where: { id },
         data: { status: "CANCELLED" },
+      }),
+    ]);
+
+    // Send notifications to all passengers
+    for (const booking of bookingsToNotify) {
+      try {
+        await this.notifications.sendNotification(
+          booking.userId,
+          "Ride Cancelled",
+          `The driver has cancelled the ride from ${ride.startLocation} to ${ride.endLocation}.`,
+          { rideId: id, type: 'RIDE_CANCELLED' }
+        );
+      } catch (e) {
+        this.logger.error(`Failed to notify passenger ${booking.userId} of ride cancellation`, e);
+      }
+    }
+
+    return result;
+  }
+
+  async completeRide(id: string, driverId: string) {
+    const ride = await this.findOne(id);
+    if (ride.driverId !== driverId) {
+      throw new NotFoundException("Not authorized to complete this ride");
+    }
+
+    const now = new Date();
+    if (new Date(ride.departureDatetime) > now) {
+      throw new BadRequestException(
+        "Cannot complete a ride that hasn't started yet",
+      );
+    }
+
+    return this.prisma.$transaction([
+      // Only complete bookings that were confirmed
+      this.prisma.booking.updateMany({
+        where: { rideId: id, status: "CONFIRMED" },
+        data: { status: "COMPLETED" },
+      }),
+      // Any still pending should be cancelled
+      this.prisma.booking.updateMany({
+        where: { rideId: id, status: "PENDING" },
+        data: { status: "CANCELLED" },
+      }),
+      this.prisma.ride.update({
+        where: { id },
+        data: { status: "COMPLETED" },
       }),
     ]);
   }

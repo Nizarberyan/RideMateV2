@@ -113,12 +113,14 @@ export const createClient = (options: ClientOptions) => {
       headers,
     });
 
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : {};
+
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || "Something went wrong");
+      throw new Error(data.message || "Something went wrong");
     }
 
-    return response.json();
+    return data;
   };
 
   return {

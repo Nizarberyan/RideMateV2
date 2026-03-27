@@ -43,5 +43,13 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsString()
+  language?: string;
+
+  @IsOptional()
+  @IsString()
+  pushToken?: string;
+
+  @IsOptional()
+  @IsString()
   refreshToken?: string | null;
 }

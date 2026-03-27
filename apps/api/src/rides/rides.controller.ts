@@ -89,6 +89,12 @@ export class RidesController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post(":id/complete")
+  completeRide(@Request() req: AuthenticatedRequest, @Param("id") id: string) {
+    return this.ridesService.completeRide(id, req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Delete(":id")
   remove(@Request() req: AuthenticatedRequest, @Param("id") id: string) {
     return this.ridesService.remove(id, req.user.id);

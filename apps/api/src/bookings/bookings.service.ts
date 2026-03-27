@@ -7,6 +7,7 @@ import {
 import { CreateBookingDto } from "./dto/create-booking.dto";
 import { UpdateBookingDto } from "./dto/update-booking.dto";
 import { PrismaService } from "../prisma/prisma.service";
+import { NotificationsService } from "../notifications/notifications.service";
 
 type BookingWithRide = {
   id: string;
@@ -14,13 +15,17 @@ type BookingWithRide = {
   rideId: string;
   seatsBooked: number;
   status: string;
-  ride: { driverId: string; [key: string]: unknown };
+  ride: { driverId: string; startLocation: string; endLocation: string; [key: string]: unknown };
+  user: { id: string; name: string; photo: string | null };
   [key: string]: unknown;
 };
 
 @Injectable()
 export class BookingsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notifications: NotificationsService,
+  ) {}
 
   async create(userId: string, createBookingDto: CreateBookingDto) {
     // Use a transaction to atomically check seats, create booking, and decrement seats
@@ -39,7 +44,7 @@ export class BookingsService {
       // Fetch passenger details for restriction checks
       const passenger = await tx.user.findUnique({
         where: { id: userId },
-        select: { photo: true, rating: true },
+        select: { id: true, name: true, photo: true, rating: true },
       });
 
       if (!passenger) throw new NotFoundException("Passenger not found");
@@ -83,6 +88,14 @@ export class BookingsService {
         where: { id: createBookingDto.rideId },
         data: { availableSeats: { decrement: createBookingDto.seatsBooked } },
       });
+
+      // NOTIFY DRIVER
+      await this.notifications.sendNotification(
+        ride.driverId,
+        "New Ride Request",
+        `${passenger.name} wants to join your ride from ${ride.startLocation} to ${ride.endLocation}`,
+        { bookingId: booking.id, rideId: ride.id, type: 'NEW_BOOKING' }
+      );
 
       return booking;
     });
@@ -136,7 +149,7 @@ export class BookingsService {
 
   /** Passenger cancels their booking — soft-cancels and restores seats */
   async remove(id: string, userId: string) {
-    const booking = await this.findOne(id);
+    const booking = (await this.findOne(id)) as BookingWithRide;
 
     if (booking.userId !== userId) {
       throw new ForbiddenException("Not authorized to cancel this booking");
@@ -159,6 +172,14 @@ export class BookingsService {
         data: { availableSeats: { increment: booking.seatsBooked } },
       });
 
+      // NOTIFY DRIVER
+      await this.notifications.sendNotification(
+        booking.ride.driverId,
+        "Booking Cancelled",
+        `${booking.user.name} cancelled their booking for your ride to ${booking.ride.endLocation}`,
+        { bookingId: id, rideId: booking.rideId, type: 'BOOKING_CANCELLED' }
+      );
+
       return updated;
     });
   }
@@ -174,10 +195,20 @@ export class BookingsService {
         `Booking is already ${booking.status.toLowerCase()}`,
       );
     }
-    return this.prisma.booking.update({
+    const updated = await this.prisma.booking.update({
       where: { id },
       data: { status: "CONFIRMED" },
     });
+
+    // NOTIFY PASSENGER
+    await this.notifications.sendNotification(
+      booking.userId,
+      "Booking Confirmed!",
+      `Your ride to ${booking.ride.endLocation} has been confirmed by the driver.`,
+      { bookingId: id, rideId: booking.rideId, type: 'BOOKING_CONFIRMED' }
+    );
+
+    return updated;
   }
 
   /** Driver rejects / cancels a pending booking — restores seats */
@@ -198,6 +229,15 @@ export class BookingsService {
         where: { id: booking.rideId },
         data: { availableSeats: { increment: booking.seatsBooked } },
       });
+
+      // NOTIFY PASSENGER
+      await this.notifications.sendNotification(
+        booking.userId,
+        "Booking Rejected",
+        `Your booking request for the ride to ${booking.ride.endLocation} was declined.`,
+        { bookingId: id, rideId: booking.rideId, type: 'BOOKING_REJECTED' }
+      );
+
       return updated;
     });
   }

@@ -57,9 +57,11 @@ export type UserMinAggregateOutputType = {
   radius: number | null
   rating: number | null
   refreshToken: string | null
+  pushToken: string | null
   vehicleModel: string | null
   vehicleColor: string | null
   vehiclePlate: string | null
+  language: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -79,9 +81,11 @@ export type UserMaxAggregateOutputType = {
   radius: number | null
   rating: number | null
   refreshToken: string | null
+  pushToken: string | null
   vehicleModel: string | null
   vehicleColor: string | null
   vehiclePlate: string | null
+  language: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -101,9 +105,11 @@ export type UserCountAggregateOutputType = {
   radius: number
   rating: number
   refreshToken: number
+  pushToken: number
   vehicleModel: number
   vehicleColor: number
   vehiclePlate: number
+  language: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -141,9 +147,11 @@ export type UserMinAggregateInputType = {
   radius?: true
   rating?: true
   refreshToken?: true
+  pushToken?: true
   vehicleModel?: true
   vehicleColor?: true
   vehiclePlate?: true
+  language?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -163,9 +171,11 @@ export type UserMaxAggregateInputType = {
   radius?: true
   rating?: true
   refreshToken?: true
+  pushToken?: true
   vehicleModel?: true
   vehicleColor?: true
   vehiclePlate?: true
+  language?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -185,9 +195,11 @@ export type UserCountAggregateInputType = {
   radius?: true
   rating?: true
   refreshToken?: true
+  pushToken?: true
   vehicleModel?: true
   vehicleColor?: true
   vehiclePlate?: true
+  language?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -294,9 +306,11 @@ export type UserGroupByOutputType = {
   radius: number
   rating: number
   refreshToken: string | null
+  pushToken: string | null
   vehicleModel: string | null
   vehicleColor: string | null
   vehiclePlate: string | null
+  language: string
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
@@ -339,9 +353,11 @@ export type UserWhereInput = {
   radius?: Prisma.FloatFilter<"User"> | number
   rating?: Prisma.FloatFilter<"User"> | number
   refreshToken?: Prisma.StringNullableFilter<"User"> | string | null
+  pushToken?: Prisma.StringNullableFilter<"User"> | string | null
   vehicleModel?: Prisma.StringNullableFilter<"User"> | string | null
   vehicleColor?: Prisma.StringNullableFilter<"User"> | string | null
   vehiclePlate?: Prisma.StringNullableFilter<"User"> | string | null
+  language?: Prisma.StringFilter<"User"> | string
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   ridesAsDriver?: Prisma.RideListRelationFilter
@@ -350,6 +366,7 @@ export type UserWhereInput = {
   reviewsReceived?: Prisma.ReviewListRelationFilter
   complaintsReported?: Prisma.ComplaintListRelationFilter
   complaintsReceived?: Prisma.ComplaintListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -367,9 +384,11 @@ export type UserOrderByWithRelationInput = {
   radius?: Prisma.SortOrder
   rating?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  pushToken?: Prisma.SortOrderInput | Prisma.SortOrder
   vehicleModel?: Prisma.SortOrderInput | Prisma.SortOrder
   vehicleColor?: Prisma.SortOrderInput | Prisma.SortOrder
   vehiclePlate?: Prisma.SortOrderInput | Prisma.SortOrder
+  language?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ridesAsDriver?: Prisma.RideOrderByRelationAggregateInput
@@ -378,6 +397,7 @@ export type UserOrderByWithRelationInput = {
   reviewsReceived?: Prisma.ReviewOrderByRelationAggregateInput
   complaintsReported?: Prisma.ComplaintOrderByRelationAggregateInput
   complaintsReceived?: Prisma.ComplaintOrderByRelationAggregateInput
+  notifications?: Prisma.NotificationOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -398,9 +418,11 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   radius?: Prisma.FloatFilter<"User"> | number
   rating?: Prisma.FloatFilter<"User"> | number
   refreshToken?: Prisma.StringNullableFilter<"User"> | string | null
+  pushToken?: Prisma.StringNullableFilter<"User"> | string | null
   vehicleModel?: Prisma.StringNullableFilter<"User"> | string | null
   vehicleColor?: Prisma.StringNullableFilter<"User"> | string | null
   vehiclePlate?: Prisma.StringNullableFilter<"User"> | string | null
+  language?: Prisma.StringFilter<"User"> | string
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   ridesAsDriver?: Prisma.RideListRelationFilter
@@ -409,6 +431,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   reviewsReceived?: Prisma.ReviewListRelationFilter
   complaintsReported?: Prisma.ComplaintListRelationFilter
   complaintsReceived?: Prisma.ComplaintListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -426,9 +449,11 @@ export type UserOrderByWithAggregationInput = {
   radius?: Prisma.SortOrder
   rating?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  pushToken?: Prisma.SortOrderInput | Prisma.SortOrder
   vehicleModel?: Prisma.SortOrderInput | Prisma.SortOrder
   vehicleColor?: Prisma.SortOrderInput | Prisma.SortOrder
   vehiclePlate?: Prisma.SortOrderInput | Prisma.SortOrder
+  language?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -456,9 +481,11 @@ export type UserScalarWhereWithAggregatesInput = {
   radius?: Prisma.FloatWithAggregatesFilter<"User"> | number
   rating?: Prisma.FloatWithAggregatesFilter<"User"> | number
   refreshToken?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  pushToken?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   vehicleModel?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   vehicleColor?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   vehiclePlate?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  language?: Prisma.StringWithAggregatesFilter<"User"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -478,9 +505,11 @@ export type UserCreateInput = {
   radius?: number
   rating?: number
   refreshToken?: string | null
+  pushToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
   vehiclePlate?: string | null
+  language?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   ridesAsDriver?: Prisma.RideCreateNestedManyWithoutDriverInput
@@ -489,6 +518,7 @@ export type UserCreateInput = {
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutTargetInput
   complaintsReported?: Prisma.ComplaintCreateNestedManyWithoutReporterInput
   complaintsReceived?: Prisma.ComplaintCreateNestedManyWithoutTargetInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -506,9 +536,11 @@ export type UserUncheckedCreateInput = {
   radius?: number
   rating?: number
   refreshToken?: string | null
+  pushToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
   vehiclePlate?: string | null
+  language?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   ridesAsDriver?: Prisma.RideUncheckedCreateNestedManyWithoutDriverInput
@@ -517,6 +549,7 @@ export type UserUncheckedCreateInput = {
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutTargetInput
   complaintsReported?: Prisma.ComplaintUncheckedCreateNestedManyWithoutReporterInput
   complaintsReceived?: Prisma.ComplaintUncheckedCreateNestedManyWithoutTargetInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -534,9 +567,11 @@ export type UserUpdateInput = {
   radius?: Prisma.FloatFieldUpdateOperationsInput | number
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehiclePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ridesAsDriver?: Prisma.RideUpdateManyWithoutDriverNestedInput
@@ -545,6 +580,7 @@ export type UserUpdateInput = {
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutTargetNestedInput
   complaintsReported?: Prisma.ComplaintUpdateManyWithoutReporterNestedInput
   complaintsReceived?: Prisma.ComplaintUpdateManyWithoutTargetNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -562,9 +598,11 @@ export type UserUncheckedUpdateInput = {
   radius?: Prisma.FloatFieldUpdateOperationsInput | number
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehiclePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ridesAsDriver?: Prisma.RideUncheckedUpdateManyWithoutDriverNestedInput
@@ -573,6 +611,7 @@ export type UserUncheckedUpdateInput = {
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutTargetNestedInput
   complaintsReported?: Prisma.ComplaintUncheckedUpdateManyWithoutReporterNestedInput
   complaintsReceived?: Prisma.ComplaintUncheckedUpdateManyWithoutTargetNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -590,9 +629,11 @@ export type UserCreateManyInput = {
   radius?: number
   rating?: number
   refreshToken?: string | null
+  pushToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
   vehiclePlate?: string | null
+  language?: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -612,9 +653,11 @@ export type UserUpdateManyMutationInput = {
   radius?: Prisma.FloatFieldUpdateOperationsInput | number
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehiclePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -634,9 +677,11 @@ export type UserUncheckedUpdateManyInput = {
   radius?: Prisma.FloatFieldUpdateOperationsInput | number
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehiclePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -656,9 +701,11 @@ export type UserCountOrderByAggregateInput = {
   radius?: Prisma.SortOrder
   rating?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrder
+  pushToken?: Prisma.SortOrder
   vehicleModel?: Prisma.SortOrder
   vehicleColor?: Prisma.SortOrder
   vehiclePlate?: Prisma.SortOrder
+  language?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -686,9 +733,11 @@ export type UserMaxOrderByAggregateInput = {
   radius?: Prisma.SortOrder
   rating?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrder
+  pushToken?: Prisma.SortOrder
   vehicleModel?: Prisma.SortOrder
   vehicleColor?: Prisma.SortOrder
   vehiclePlate?: Prisma.SortOrder
+  language?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -708,9 +757,11 @@ export type UserMinOrderByAggregateInput = {
   radius?: Prisma.SortOrder
   rating?: Prisma.SortOrder
   refreshToken?: Prisma.SortOrder
+  pushToken?: Prisma.SortOrder
   vehicleModel?: Prisma.SortOrder
   vehicleColor?: Prisma.SortOrder
   vehiclePlate?: Prisma.SortOrder
+  language?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -758,6 +809,20 @@ export type NullableFloatFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type UserCreateNestedOneWithoutNotificationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotificationsInput
+  upsert?: Prisma.UserUpsertWithoutNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotificationsInput, Prisma.UserUpdateWithoutNotificationsInput>, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
 }
 
 export type UserCreateNestedOneWithoutRidesAsDriverInput = {
@@ -844,6 +909,142 @@ export type UserUpdateOneRequiredWithoutComplaintsReceivedNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutComplaintsReceivedInput, Prisma.UserUpdateWithoutComplaintsReceivedInput>, Prisma.UserUncheckedUpdateWithoutComplaintsReceivedInput>
 }
 
+export type UserCreateWithoutNotificationsInput = {
+  id?: string
+  name?: string | null
+  email: string
+  password: string
+  bio?: string | null
+  photo?: string | null
+  role?: $Enums.Role
+  carbonSavedKg?: number
+  city?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  radius?: number
+  rating?: number
+  refreshToken?: string | null
+  pushToken?: string | null
+  vehicleModel?: string | null
+  vehicleColor?: string | null
+  vehiclePlate?: string | null
+  language?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ridesAsDriver?: Prisma.RideCreateNestedManyWithoutDriverInput
+  bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutReviewerInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutTargetInput
+  complaintsReported?: Prisma.ComplaintCreateNestedManyWithoutReporterInput
+  complaintsReceived?: Prisma.ComplaintCreateNestedManyWithoutTargetInput
+}
+
+export type UserUncheckedCreateWithoutNotificationsInput = {
+  id?: string
+  name?: string | null
+  email: string
+  password: string
+  bio?: string | null
+  photo?: string | null
+  role?: $Enums.Role
+  carbonSavedKg?: number
+  city?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  radius?: number
+  rating?: number
+  refreshToken?: string | null
+  pushToken?: string | null
+  vehicleModel?: string | null
+  vehicleColor?: string | null
+  vehiclePlate?: string | null
+  language?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ridesAsDriver?: Prisma.RideUncheckedCreateNestedManyWithoutDriverInput
+  bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutTargetInput
+  complaintsReported?: Prisma.ComplaintUncheckedCreateNestedManyWithoutReporterInput
+  complaintsReceived?: Prisma.ComplaintUncheckedCreateNestedManyWithoutTargetInput
+}
+
+export type UserCreateOrConnectWithoutNotificationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+}
+
+export type UserUpsertWithoutNotificationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutNotificationsInput, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutNotificationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutNotificationsInput, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type UserUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  carbonSavedKg?: Prisma.FloatFieldUpdateOperationsInput | number
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  radius?: Prisma.FloatFieldUpdateOperationsInput | number
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vehiclePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ridesAsDriver?: Prisma.RideUpdateManyWithoutDriverNestedInput
+  bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutReviewerNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutTargetNestedInput
+  complaintsReported?: Prisma.ComplaintUpdateManyWithoutReporterNestedInput
+  complaintsReceived?: Prisma.ComplaintUpdateManyWithoutTargetNestedInput
+}
+
+export type UserUncheckedUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  carbonSavedKg?: Prisma.FloatFieldUpdateOperationsInput | number
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  radius?: Prisma.FloatFieldUpdateOperationsInput | number
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  vehiclePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ridesAsDriver?: Prisma.RideUncheckedUpdateManyWithoutDriverNestedInput
+  bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutTargetNestedInput
+  complaintsReported?: Prisma.ComplaintUncheckedUpdateManyWithoutReporterNestedInput
+  complaintsReceived?: Prisma.ComplaintUncheckedUpdateManyWithoutTargetNestedInput
+}
+
 export type UserCreateWithoutRidesAsDriverInput = {
   id?: string
   name?: string | null
@@ -859,9 +1060,11 @@ export type UserCreateWithoutRidesAsDriverInput = {
   radius?: number
   rating?: number
   refreshToken?: string | null
+  pushToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
   vehiclePlate?: string | null
+  language?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
@@ -869,6 +1072,7 @@ export type UserCreateWithoutRidesAsDriverInput = {
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutTargetInput
   complaintsReported?: Prisma.ComplaintCreateNestedManyWithoutReporterInput
   complaintsReceived?: Prisma.ComplaintCreateNestedManyWithoutTargetInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRidesAsDriverInput = {
@@ -886,9 +1090,11 @@ export type UserUncheckedCreateWithoutRidesAsDriverInput = {
   radius?: number
   rating?: number
   refreshToken?: string | null
+  pushToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
   vehiclePlate?: string | null
+  language?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
@@ -896,6 +1102,7 @@ export type UserUncheckedCreateWithoutRidesAsDriverInput = {
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutTargetInput
   complaintsReported?: Prisma.ComplaintUncheckedCreateNestedManyWithoutReporterInput
   complaintsReceived?: Prisma.ComplaintUncheckedCreateNestedManyWithoutTargetInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRidesAsDriverInput = {
@@ -929,9 +1136,11 @@ export type UserUpdateWithoutRidesAsDriverInput = {
   radius?: Prisma.FloatFieldUpdateOperationsInput | number
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehiclePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
@@ -939,6 +1148,7 @@ export type UserUpdateWithoutRidesAsDriverInput = {
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutTargetNestedInput
   complaintsReported?: Prisma.ComplaintUpdateManyWithoutReporterNestedInput
   complaintsReceived?: Prisma.ComplaintUpdateManyWithoutTargetNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRidesAsDriverInput = {
@@ -956,9 +1166,11 @@ export type UserUncheckedUpdateWithoutRidesAsDriverInput = {
   radius?: Prisma.FloatFieldUpdateOperationsInput | number
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehiclePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
@@ -966,6 +1178,7 @@ export type UserUncheckedUpdateWithoutRidesAsDriverInput = {
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutTargetNestedInput
   complaintsReported?: Prisma.ComplaintUncheckedUpdateManyWithoutReporterNestedInput
   complaintsReceived?: Prisma.ComplaintUncheckedUpdateManyWithoutTargetNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBookingsInput = {
@@ -983,9 +1196,11 @@ export type UserCreateWithoutBookingsInput = {
   radius?: number
   rating?: number
   refreshToken?: string | null
+  pushToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
   vehiclePlate?: string | null
+  language?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   ridesAsDriver?: Prisma.RideCreateNestedManyWithoutDriverInput
@@ -993,6 +1208,7 @@ export type UserCreateWithoutBookingsInput = {
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutTargetInput
   complaintsReported?: Prisma.ComplaintCreateNestedManyWithoutReporterInput
   complaintsReceived?: Prisma.ComplaintCreateNestedManyWithoutTargetInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBookingsInput = {
@@ -1010,9 +1226,11 @@ export type UserUncheckedCreateWithoutBookingsInput = {
   radius?: number
   rating?: number
   refreshToken?: string | null
+  pushToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
   vehiclePlate?: string | null
+  language?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   ridesAsDriver?: Prisma.RideUncheckedCreateNestedManyWithoutDriverInput
@@ -1020,6 +1238,7 @@ export type UserUncheckedCreateWithoutBookingsInput = {
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutTargetInput
   complaintsReported?: Prisma.ComplaintUncheckedCreateNestedManyWithoutReporterInput
   complaintsReceived?: Prisma.ComplaintUncheckedCreateNestedManyWithoutTargetInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBookingsInput = {
@@ -1053,9 +1272,11 @@ export type UserUpdateWithoutBookingsInput = {
   radius?: Prisma.FloatFieldUpdateOperationsInput | number
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehiclePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ridesAsDriver?: Prisma.RideUpdateManyWithoutDriverNestedInput
@@ -1063,6 +1284,7 @@ export type UserUpdateWithoutBookingsInput = {
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutTargetNestedInput
   complaintsReported?: Prisma.ComplaintUpdateManyWithoutReporterNestedInput
   complaintsReceived?: Prisma.ComplaintUpdateManyWithoutTargetNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBookingsInput = {
@@ -1080,9 +1302,11 @@ export type UserUncheckedUpdateWithoutBookingsInput = {
   radius?: Prisma.FloatFieldUpdateOperationsInput | number
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehiclePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ridesAsDriver?: Prisma.RideUncheckedUpdateManyWithoutDriverNestedInput
@@ -1090,6 +1314,7 @@ export type UserUncheckedUpdateWithoutBookingsInput = {
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutTargetNestedInput
   complaintsReported?: Prisma.ComplaintUncheckedUpdateManyWithoutReporterNestedInput
   complaintsReceived?: Prisma.ComplaintUncheckedUpdateManyWithoutTargetNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReviewsGivenInput = {
@@ -1107,9 +1332,11 @@ export type UserCreateWithoutReviewsGivenInput = {
   radius?: number
   rating?: number
   refreshToken?: string | null
+  pushToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
   vehiclePlate?: string | null
+  language?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   ridesAsDriver?: Prisma.RideCreateNestedManyWithoutDriverInput
@@ -1117,6 +1344,7 @@ export type UserCreateWithoutReviewsGivenInput = {
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutTargetInput
   complaintsReported?: Prisma.ComplaintCreateNestedManyWithoutReporterInput
   complaintsReceived?: Prisma.ComplaintCreateNestedManyWithoutTargetInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewsGivenInput = {
@@ -1134,9 +1362,11 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   radius?: number
   rating?: number
   refreshToken?: string | null
+  pushToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
   vehiclePlate?: string | null
+  language?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   ridesAsDriver?: Prisma.RideUncheckedCreateNestedManyWithoutDriverInput
@@ -1144,6 +1374,7 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutTargetInput
   complaintsReported?: Prisma.ComplaintUncheckedCreateNestedManyWithoutReporterInput
   complaintsReceived?: Prisma.ComplaintUncheckedCreateNestedManyWithoutTargetInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewsGivenInput = {
@@ -1166,9 +1397,11 @@ export type UserCreateWithoutReviewsReceivedInput = {
   radius?: number
   rating?: number
   refreshToken?: string | null
+  pushToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
   vehiclePlate?: string | null
+  language?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   ridesAsDriver?: Prisma.RideCreateNestedManyWithoutDriverInput
@@ -1176,6 +1409,7 @@ export type UserCreateWithoutReviewsReceivedInput = {
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutReviewerInput
   complaintsReported?: Prisma.ComplaintCreateNestedManyWithoutReporterInput
   complaintsReceived?: Prisma.ComplaintCreateNestedManyWithoutTargetInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewsReceivedInput = {
@@ -1193,9 +1427,11 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   radius?: number
   rating?: number
   refreshToken?: string | null
+  pushToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
   vehiclePlate?: string | null
+  language?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   ridesAsDriver?: Prisma.RideUncheckedCreateNestedManyWithoutDriverInput
@@ -1203,6 +1439,7 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerInput
   complaintsReported?: Prisma.ComplaintUncheckedCreateNestedManyWithoutReporterInput
   complaintsReceived?: Prisma.ComplaintUncheckedCreateNestedManyWithoutTargetInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewsReceivedInput = {
@@ -1236,9 +1473,11 @@ export type UserUpdateWithoutReviewsGivenInput = {
   radius?: Prisma.FloatFieldUpdateOperationsInput | number
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehiclePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ridesAsDriver?: Prisma.RideUpdateManyWithoutDriverNestedInput
@@ -1246,6 +1485,7 @@ export type UserUpdateWithoutReviewsGivenInput = {
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutTargetNestedInput
   complaintsReported?: Prisma.ComplaintUpdateManyWithoutReporterNestedInput
   complaintsReceived?: Prisma.ComplaintUpdateManyWithoutTargetNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsGivenInput = {
@@ -1263,9 +1503,11 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   radius?: Prisma.FloatFieldUpdateOperationsInput | number
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehiclePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ridesAsDriver?: Prisma.RideUncheckedUpdateManyWithoutDriverNestedInput
@@ -1273,6 +1515,7 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutTargetNestedInput
   complaintsReported?: Prisma.ComplaintUncheckedUpdateManyWithoutReporterNestedInput
   complaintsReceived?: Prisma.ComplaintUncheckedUpdateManyWithoutTargetNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReviewsReceivedInput = {
@@ -1301,9 +1544,11 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   radius?: Prisma.FloatFieldUpdateOperationsInput | number
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehiclePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ridesAsDriver?: Prisma.RideUpdateManyWithoutDriverNestedInput
@@ -1311,6 +1556,7 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutReviewerNestedInput
   complaintsReported?: Prisma.ComplaintUpdateManyWithoutReporterNestedInput
   complaintsReceived?: Prisma.ComplaintUpdateManyWithoutTargetNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
@@ -1328,9 +1574,11 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   radius?: Prisma.FloatFieldUpdateOperationsInput | number
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehiclePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ridesAsDriver?: Prisma.RideUncheckedUpdateManyWithoutDriverNestedInput
@@ -1338,6 +1586,7 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerNestedInput
   complaintsReported?: Prisma.ComplaintUncheckedUpdateManyWithoutReporterNestedInput
   complaintsReceived?: Prisma.ComplaintUncheckedUpdateManyWithoutTargetNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutComplaintsReportedInput = {
@@ -1355,9 +1604,11 @@ export type UserCreateWithoutComplaintsReportedInput = {
   radius?: number
   rating?: number
   refreshToken?: string | null
+  pushToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
   vehiclePlate?: string | null
+  language?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   ridesAsDriver?: Prisma.RideCreateNestedManyWithoutDriverInput
@@ -1365,6 +1616,7 @@ export type UserCreateWithoutComplaintsReportedInput = {
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutReviewerInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutTargetInput
   complaintsReceived?: Prisma.ComplaintCreateNestedManyWithoutTargetInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutComplaintsReportedInput = {
@@ -1382,9 +1634,11 @@ export type UserUncheckedCreateWithoutComplaintsReportedInput = {
   radius?: number
   rating?: number
   refreshToken?: string | null
+  pushToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
   vehiclePlate?: string | null
+  language?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   ridesAsDriver?: Prisma.RideUncheckedCreateNestedManyWithoutDriverInput
@@ -1392,6 +1646,7 @@ export type UserUncheckedCreateWithoutComplaintsReportedInput = {
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutTargetInput
   complaintsReceived?: Prisma.ComplaintUncheckedCreateNestedManyWithoutTargetInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutComplaintsReportedInput = {
@@ -1414,9 +1669,11 @@ export type UserCreateWithoutComplaintsReceivedInput = {
   radius?: number
   rating?: number
   refreshToken?: string | null
+  pushToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
   vehiclePlate?: string | null
+  language?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   ridesAsDriver?: Prisma.RideCreateNestedManyWithoutDriverInput
@@ -1424,6 +1681,7 @@ export type UserCreateWithoutComplaintsReceivedInput = {
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutReviewerInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutTargetInput
   complaintsReported?: Prisma.ComplaintCreateNestedManyWithoutReporterInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutComplaintsReceivedInput = {
@@ -1441,9 +1699,11 @@ export type UserUncheckedCreateWithoutComplaintsReceivedInput = {
   radius?: number
   rating?: number
   refreshToken?: string | null
+  pushToken?: string | null
   vehicleModel?: string | null
   vehicleColor?: string | null
   vehiclePlate?: string | null
+  language?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   ridesAsDriver?: Prisma.RideUncheckedCreateNestedManyWithoutDriverInput
@@ -1451,6 +1711,7 @@ export type UserUncheckedCreateWithoutComplaintsReceivedInput = {
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutTargetInput
   complaintsReported?: Prisma.ComplaintUncheckedCreateNestedManyWithoutReporterInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutComplaintsReceivedInput = {
@@ -1484,9 +1745,11 @@ export type UserUpdateWithoutComplaintsReportedInput = {
   radius?: Prisma.FloatFieldUpdateOperationsInput | number
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehiclePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ridesAsDriver?: Prisma.RideUpdateManyWithoutDriverNestedInput
@@ -1494,6 +1757,7 @@ export type UserUpdateWithoutComplaintsReportedInput = {
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutReviewerNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutTargetNestedInput
   complaintsReceived?: Prisma.ComplaintUpdateManyWithoutTargetNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutComplaintsReportedInput = {
@@ -1511,9 +1775,11 @@ export type UserUncheckedUpdateWithoutComplaintsReportedInput = {
   radius?: Prisma.FloatFieldUpdateOperationsInput | number
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehiclePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ridesAsDriver?: Prisma.RideUncheckedUpdateManyWithoutDriverNestedInput
@@ -1521,6 +1787,7 @@ export type UserUncheckedUpdateWithoutComplaintsReportedInput = {
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutTargetNestedInput
   complaintsReceived?: Prisma.ComplaintUncheckedUpdateManyWithoutTargetNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutComplaintsReceivedInput = {
@@ -1549,9 +1816,11 @@ export type UserUpdateWithoutComplaintsReceivedInput = {
   radius?: Prisma.FloatFieldUpdateOperationsInput | number
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehiclePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ridesAsDriver?: Prisma.RideUpdateManyWithoutDriverNestedInput
@@ -1559,6 +1828,7 @@ export type UserUpdateWithoutComplaintsReceivedInput = {
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutReviewerNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutTargetNestedInput
   complaintsReported?: Prisma.ComplaintUpdateManyWithoutReporterNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutComplaintsReceivedInput = {
@@ -1576,9 +1846,11 @@ export type UserUncheckedUpdateWithoutComplaintsReceivedInput = {
   radius?: Prisma.FloatFieldUpdateOperationsInput | number
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   refreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehicleColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   vehiclePlate?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  language?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ridesAsDriver?: Prisma.RideUncheckedUpdateManyWithoutDriverNestedInput
@@ -1586,6 +1858,7 @@ export type UserUncheckedUpdateWithoutComplaintsReceivedInput = {
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutTargetNestedInput
   complaintsReported?: Prisma.ComplaintUncheckedUpdateManyWithoutReporterNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -1600,6 +1873,7 @@ export type UserCountOutputType = {
   reviewsReceived: number
   complaintsReported: number
   complaintsReceived: number
+  notifications: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1609,6 +1883,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   reviewsReceived?: boolean | UserCountOutputTypeCountReviewsReceivedArgs
   complaintsReported?: boolean | UserCountOutputTypeCountComplaintsReportedArgs
   complaintsReceived?: boolean | UserCountOutputTypeCountComplaintsReceivedArgs
+  notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
 }
 
 /**
@@ -1663,6 +1938,13 @@ export type UserCountOutputTypeCountComplaintsReceivedArgs<ExtArgs extends runti
   where?: Prisma.ComplaintWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1679,9 +1961,11 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   radius?: boolean
   rating?: boolean
   refreshToken?: boolean
+  pushToken?: boolean
   vehicleModel?: boolean
   vehicleColor?: boolean
   vehiclePlate?: boolean
+  language?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ridesAsDriver?: boolean | Prisma.User$ridesAsDriverArgs<ExtArgs>
@@ -1690,6 +1974,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   reviewsReceived?: boolean | Prisma.User$reviewsReceivedArgs<ExtArgs>
   complaintsReported?: boolean | Prisma.User$complaintsReportedArgs<ExtArgs>
   complaintsReceived?: boolean | Prisma.User$complaintsReceivedArgs<ExtArgs>
+  notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1708,9 +1993,11 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   radius?: boolean
   rating?: boolean
   refreshToken?: boolean
+  pushToken?: boolean
   vehicleModel?: boolean
   vehicleColor?: boolean
   vehiclePlate?: boolean
+  language?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -1730,9 +2017,11 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   radius?: boolean
   rating?: boolean
   refreshToken?: boolean
+  pushToken?: boolean
   vehicleModel?: boolean
   vehicleColor?: boolean
   vehiclePlate?: boolean
+  language?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -1752,14 +2041,16 @@ export type UserSelectScalar = {
   radius?: boolean
   rating?: boolean
   refreshToken?: boolean
+  pushToken?: boolean
   vehicleModel?: boolean
   vehicleColor?: boolean
   vehiclePlate?: boolean
+  language?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "bio" | "photo" | "role" | "carbonSavedKg" | "city" | "latitude" | "longitude" | "radius" | "rating" | "refreshToken" | "vehicleModel" | "vehicleColor" | "vehiclePlate" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "bio" | "photo" | "role" | "carbonSavedKg" | "city" | "latitude" | "longitude" | "radius" | "rating" | "refreshToken" | "pushToken" | "vehicleModel" | "vehicleColor" | "vehiclePlate" | "language" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ridesAsDriver?: boolean | Prisma.User$ridesAsDriverArgs<ExtArgs>
   bookings?: boolean | Prisma.User$bookingsArgs<ExtArgs>
@@ -1767,6 +2058,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   reviewsReceived?: boolean | Prisma.User$reviewsReceivedArgs<ExtArgs>
   complaintsReported?: boolean | Prisma.User$complaintsReportedArgs<ExtArgs>
   complaintsReceived?: boolean | Prisma.User$complaintsReceivedArgs<ExtArgs>
+  notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1781,6 +2073,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     reviewsReceived: Prisma.$ReviewPayload<ExtArgs>[]
     complaintsReported: Prisma.$ComplaintPayload<ExtArgs>[]
     complaintsReceived: Prisma.$ComplaintPayload<ExtArgs>[]
+    notifications: Prisma.$NotificationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1797,9 +2090,11 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     radius: number
     rating: number
     refreshToken: string | null
+    pushToken: string | null
     vehicleModel: string | null
     vehicleColor: string | null
     vehiclePlate: string | null
+    language: string
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -2202,6 +2497,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   reviewsReceived<T extends Prisma.User$reviewsReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reviewsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   complaintsReported<T extends Prisma.User$complaintsReportedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$complaintsReportedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   complaintsReceived<T extends Prisma.User$complaintsReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$complaintsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComplaintPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2245,9 +2541,11 @@ export interface UserFieldRefs {
   readonly radius: Prisma.FieldRef<"User", 'Float'>
   readonly rating: Prisma.FieldRef<"User", 'Float'>
   readonly refreshToken: Prisma.FieldRef<"User", 'String'>
+  readonly pushToken: Prisma.FieldRef<"User", 'String'>
   readonly vehicleModel: Prisma.FieldRef<"User", 'String'>
   readonly vehicleColor: Prisma.FieldRef<"User", 'String'>
   readonly vehiclePlate: Prisma.FieldRef<"User", 'String'>
+  readonly language: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }
@@ -2446,6 +2744,11 @@ export type UserFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Skip the first `n` Users.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Users.
+   */
   distinct?: Prisma.UserScalarFieldEnum | Prisma.UserScalarFieldEnum[]
 }
 
@@ -2779,6 +3082,30 @@ export type User$complaintsReceivedArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.ComplaintScalarFieldEnum | Prisma.ComplaintScalarFieldEnum[]
+}
+
+/**
+ * User.notifications
+ */
+export type User$notificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notification
+   */
+  select?: Prisma.NotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notification
+   */
+  omit?: Prisma.NotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationInclude<ExtArgs> | null
+  where?: Prisma.NotificationWhereInput
+  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
 }
 
 /**

@@ -29,10 +29,15 @@ model User {
   // Refresh Token
   refreshToken  String?
 
+  // Push Notification Token
+  pushToken     String?
+
   // Vehicle Details (for drivers)
   vehicleModel  String?
   vehicleColor  String?
   vehiclePlate  String?
+
+  language      String   @default("en")
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -43,11 +48,23 @@ model User {
   reviewsReceived   Review[]    @relation("ReviewsReceived")
   complaintsReported Complaint[] @relation("ComplaintsReported")
   complaintsReceived Complaint[] @relation("ComplaintsReceived")
+  notifications     Notification[]
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  message   String
+  data      Json?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 
 model Ride {

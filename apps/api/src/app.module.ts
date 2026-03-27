@@ -9,6 +9,7 @@ import { RidesModule } from "./rides/rides.module";
 import { BookingsModule } from "./bookings/bookings.module";
 import { ReviewsModule } from "./reviews/reviews.module";
 import { ComplaintsModule } from "./complaints/complaints.module";
+import { NotificationsModule } from "./notifications/notifications.module";
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ComplaintsModule } from "./complaints/complaints.module";
     BookingsModule,
     ReviewsModule,
     ComplaintsModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

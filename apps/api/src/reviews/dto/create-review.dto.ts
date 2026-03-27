@@ -1,4 +1,12 @@
-import { IsNotEmpty, IsNumber, IsString, Min, Max, IsEnum, IsOptional } from "class-validator";
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Min,
+  Max,
+  IsEnum,
+  IsOptional,
+} from "class-validator";
 
 export enum ReviewRole {
   DRIVER = "DRIVER",

@@ -5,6 +5,7 @@ import {
   Min,
   IsOptional,
   IsString,
+  IsBoolean,
 } from "class-validator";
 
 export class CreateRideDto {
@@ -44,4 +45,13 @@ export class CreateRideDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  requirePhoto?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  minRating?: number;
 }
