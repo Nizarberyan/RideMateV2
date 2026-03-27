@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: ridemate-backend
+    env: node
+    # Use the root of the repo as the context
+    rootContext: .
+    # Build settings for a NestJS app in a pnpm monorepo
+    # 1. Install all dependencies
+    # 2. Build the 'api' package
+    # 3. Run prisma migrations to sync the database
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter api run build && pnpm --filter api dlx prisma migrate deploy
+    # Start the production build
+    startCommand: pnpm --filter api run start:prod
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: PNPM_VERSION
+        value: "10.32.1"
+      - key: PORT
+        value: "3000"
+      - key: DATABASE_URL
+        sync: false
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production
