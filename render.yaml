@@ -8,7 +8,7 @@ services:
     # 2. Generate Prisma client
     # 3. Build the 'api' package
     # 4. Run prisma migrations to sync the database
-    buildCommand: pnpm install --frozen-lockfile && pnpm --filter api dlx prisma generate && pnpm --filter api run build && pnpm --filter api dlx prisma migrate deploy
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter api exec prisma generate && pnpm --filter api run build && pnpm --filter api exec prisma migrate deploy
     # Start the production build using pnpm filter to ensure correct working directory
     startCommand: pnpm --filter api run start:prod
     envVars:
