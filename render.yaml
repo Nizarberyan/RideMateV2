@@ -2,6 +2,7 @@ services:
   - type: web
     name: ridemate-backend
     runtime: node
+    plan: free
     # Build settings for a NestJS app in a pnpm monorepo
     # 1. Install all dependencies from root
     # 2. Generate Prisma client
